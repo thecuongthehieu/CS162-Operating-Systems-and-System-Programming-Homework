@@ -1,0 +1,52 @@
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Other stuff
+.dSYM
+.DS_Store
+*.swp
+
+# HW0
+hw0/limits
+hw0/map
+hw0/fixit/sort
+hw0/fixit/uniq
+hw0/wc/wc
+hw0/words/words
+!hw0/words/wc_sort.o
+
+# HW1
+hw1/pthread
+hw1/words
+hw1/lwords
+hw1/pwords
+hw1/fwords
+
+# HW5
+hw5/**/build
