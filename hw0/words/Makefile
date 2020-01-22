@@ -3,7 +3,7 @@
 CC?=gcc
 CFLAGS?=-Wall
 SOURCES=main.c word_count.c
-# comment the following out if you are providing your own sort_words
+# The skeleton would include the library, unless student does the extra credit
 LIBRARIES=wc_sort.o
 BINARIES=words
 

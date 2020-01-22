@@ -1,6 +1,0 @@
-1. Given any 2 function names recieves full credit. .11112
-2. Given at least 2 segments should receive full credit .11111
-3. Some form of downwards .11111
-4. 48 bytes gets full credit .11111
-5. Upwards and any address .11111
-6. No receives full credit. .11111

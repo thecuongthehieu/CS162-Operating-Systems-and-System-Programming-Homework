@@ -1,4 +1,0 @@
-1. Any answer of the form: file format; elf64-x86-64, architecture: i386:x86-64 0.16667
-2. Name of any segment 0.16667
-3. Address of the function + .text is full credit 0.16666
-4. It does not exist. 0.16666
