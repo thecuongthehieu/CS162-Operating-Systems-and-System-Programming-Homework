@@ -39,13 +39,8 @@ WordCount *word_counts = NULL;
 #define MAX_WORD_LEN 64
 
 /*
- * Given infile, extracts and adds each word in the FILE to `wclist`.
- * Useful functions: fgetc(), isalpha(), tolower(), add_word().
- */
-void count_words(WordCount **wclist, FILE *infile) {
-}
-
-/*
+ * 3.1.1 Total Word Count
+ *
  * Returns the total amount of words found in infile.
  * Useful functions: fgetc(), isalpha().
  */
@@ -55,7 +50,19 @@ int num_words(FILE* infile) {
   return num_words;
 }
 
-// Comparator to sort list by frequency.
+/*
+ * 3.1.2 Word Frequency Count
+ *
+ * Given infile, extracts and adds each word in the FILE to `wclist`.
+ * Useful functions: fgetc(), isalpha(), tolower(), add_word().
+ */
+void count_words(WordCount **wclist, FILE *infile) {
+}
+
+/*
+ * Comparator to sort list by frequency.
+ * Useful function: strcmp().
+ */
 static bool wordcount_less(const WordCount *wc1, const WordCount *wc2) {
   return 0;
 }
@@ -70,16 +77,16 @@ static int display_help(void) {
 }
 
 /*
-  main - handle command line and file handles
+ * Handle command line flags and arguments.
  */
 int main (int argc, char *argv[]) {
 
   // Count Mode (default): outputs the total amount of words counted
   bool count_mode = true;
+  int total_words = 0;
 
   // Freq Mode: outputs the frequency of each word
   bool freq_mode = false;
-  int total_words = 0;
 
   FILE *infile = NULL;
 
@@ -118,10 +125,12 @@ int main (int argc, char *argv[]) {
   init_words(&word_counts);
 
   if ((argc - optind) < 1) {
-    // No input file specified, instead, read from STDIN.
+    // No input file specified, instead, read from STDIN instead.
     infile = stdin;
   } else {
-    // At least one file specified.
+    // At least one file specified. Useful functions: fopen(), fclose().
+    // The first file can be found at argv[optind]. The last file can be
+    // found at argv[argc-1].
   }
 
   if (count_mode) {
