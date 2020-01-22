@@ -1,0 +1,6 @@
+1. Any address here is valid. 0.11112 pts
+2. An address with a location is valid. 0.11111 pts
+3. Give credit for any address 0.11111 pts
+4. Give credit for saying that a full stack trace was made of the function calls. 0.11111 pts
+5. Give credit for saying that all of the frame information is dumped. 0.11111 pts
+6. Give credit for saying that all registers are dumped. 0.11111 pts
