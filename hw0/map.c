@@ -5,18 +5,8 @@
 int foo;
 
 /* UNCOMMENT THIS LINE for 3.4.3*/
-//extern int recur(int i);
+extern int recur(int i);
 
-int recur(int i) {
-    /* A stack allocated variable within a recursive function */
-    int j = i;
-
-    if (i > 0) {
-        return recur(i - 1);
-    }
-
-    return 0;
-}
 
 /* A statically allocated, pre-initialized variable */
 volatile int stuff = 7;

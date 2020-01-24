@@ -28,11 +28,11 @@ Mutators take a reference to a list as first arg.
 #ifndef word_count_h
 #define word_count_h
 
+#include <ctype.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-#include <ctype.h>
 #include <stdlib.h>
 
 /* Representation of a word count object.
@@ -69,5 +69,6 @@ void wordcount_insert_ordered(WordCount **wclist, WordCount *elem, bool less(con
 /* Sort a word count list in place */
 void wordcount_sort(WordCount **wclist, bool less(const WordCount *, const WordCount *));
 
-
 #endif /* word_count_h */
+
+
