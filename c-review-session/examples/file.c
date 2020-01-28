@@ -5,7 +5,7 @@ int write_char(char *infile) {
     if (f != NULL) {
       char buf[1];
       size_t chars_read = fread(buf, 1, 1, f);
-      printf("The character is: %s\n", buf);
+      printf("The character is: %c\n", buf[0]);
       size_t chars_written = fwrite(buf, 1, 1, f);
       return fclose(f);
     }
