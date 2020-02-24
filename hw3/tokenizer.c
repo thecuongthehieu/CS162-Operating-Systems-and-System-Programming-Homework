@@ -78,6 +78,9 @@ struct tokens *tokenize(const char *line) {
     } else if (mode == MODE_DQUOTE) {
       if (c == '"') {
         mode = MODE_NORMAL;
+        void *word = copy_word(token, n);
+        vector_push(&tokens->tokens, &tokens->tokens_length, word);
+        n = 0;
       } else if (c == '\\') {
         if (i + 1 < line_length) {
           token[n++] = line[++i];
