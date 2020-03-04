@@ -348,7 +348,6 @@ int main(int argc, char **argv) {
   for (i = 1; i < argc; i++) {
     if (strcmp("--files", argv[i]) == 0) {
       request_handler = handle_files_request;
-      free(server_files_directory);
       server_files_directory = argv[++i];
       if (!server_files_directory) {
         fprintf(stderr, "Expected argument after --files\n");
