@@ -1,0 +1,55 @@
+3.3 The A-Z’s of GDB
+a. Run GDB
+	gdb map
+b. Set a breakpoint at the beginning of the program’s execution
+	break main
+c. Run the program until the breakpoint
+	run
+d. Where does argv point to?
+	print *argv ->  = 0x7fffffffe64a "/home/vagrant/code/personal/hw0/map"
+e. What’s at the address of argv?
+	print argv
+f. Step until you reach the first call to recur.
+	s
+g. What is the memory address or the recur function?
+	print recur
+h. Step into the first call to recur.
+	s
+i. Step until you reach the if statement
+	s
+j. Switch into assembly view
+	layout asm 
+k. Step over instructions until you reach the ‘callq‘ instruction
+	s
+l. What values are in all the registers?
+	info r
+m. Step into the call instruction
+	s
+n. Switch back to C code mode.
+	layout src
+o. Now print out the current call stack (hint: what does the backtrace command do?)
+	backtrace
+p. Now set a breakpoint on the recur function which is only triggered when the argument is 0
+	break recur
+q. Continue until the breakpoint is hit
+	c
+r. Print the call stack now
+	backtrace
+s. Now go up the call stack until you reach main, what was argc?
+	up
+t. Now step until the return statement
+	down
+
+3.4 Compiling, Assembling, and Linking
+1.
+2.
+.text : source
+.data : static data
+3.
+objmdump --syms
+4.
+https://sourceware.org/binutils/docs/binutils/objdump.html
+5.
+6.
+7.
+
