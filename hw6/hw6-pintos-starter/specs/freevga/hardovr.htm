@@ -1,0 +1,92 @@
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="Author" CONTENT="Joshua Neal">
+   <META NAME="Description" CONTENT="Pure VGA/SVGA hardware programming (registers, identification, and otherlow-level stuff.)">
+   <META NAME="KeyWords" CONTENT="VGA SVGA hardware video programming">
+   <TITLE>FreeVGA - Overview of Video Hardware Functionality</TITLE>
+</HEAD>
+<BODY>
+
+<CENTER><A HREF="home.htm">Home</A> <A HREF="#intro">Introduction</A> <A HREF="#frame">Frame
+Buffer</A> <A HREF="#graphics">Graphics Controller</A> <A HREF="#display generation">Display
+Generation</A> <A HREF="home.htm#background">Back</A>&nbsp;
+<HR><B>Hardware Level VGA and SVGA Video Programming Information Page</B></CENTER>
+
+<CENTER>Overview of Video Hardware Functionality&nbsp;
+<HR></CENTER>
+<A NAME="intro"></A><B>Introduction</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This page contains a general
+overview of the functionality of VGA and SVGA cards into various sections,
+and gives a description of the functions of each section.&nbsp; This is
+intended to be a general description for those unfamiliar to the functionality
+and capabilities of graphics hardware.&nbsp; The basic function of graphics
+hardware is to allow the CPU to manipulate memory specific to the graphics
+hardware, and to take the information stored in that memory and output
+it in a form that a monitor or LCD panel can use.
+
+<P><A NAME="frame"></A><B>Frame Buffer</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This is the component of
+the video hardware that stores the pixels and information to be displayed
+on the monitor.&nbsp; This is the center of the video hardware, as nearly
+all operations are performed on or using this data.&nbsp; The frame buffer
+is a form of RAM, which is typically located outside the main graphics
+chip and are implemented using DRAM chips; however, more sophisticated
+forms of RAM that are ideal for video hardware applications, such as VRAM.&nbsp;
+The amount of video memory that is present determines the maximum resolution
+that the hardware can generate.&nbsp; The frame buffer is usually mapped
+into a region of the host CPU's address space allowing it to be accessed
+as if it were a portion of the main memory.&nbsp; For example, in the VGA,
+this memory is mapped into the lower 1M of the CPU address space, allowing
+it to be directly accessable to real mode applications, which cannot directly
+access the remaining memory.&nbsp; In the VGA, this memory is broken up
+into 4 separate color planes, which are recombined to produce the actual
+pixel values at the time of display generation.
+
+<P><A NAME="graphics"></A><B>Graphics Controller</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This is the video chipset's
+host interface to the frame buffer, and is part of the main graphics chip
+or chips.&nbsp; It allows the host CPU to manipulate the frame buffer in
+a fashion suited to the task of graphics operations.&nbsp; It allows certain
+methods of access that are designed to reduced the CPU requirements for
+performing standard video operations, particularly in accelerated chipsets,
+which can have a quite complicated set of access methods which can include
+line drawing, area and pattern fill, color conversion/expansion, and even
+3d rendering acceleration.&nbsp; For example, in the VGA the graphics controller
+allows one write by the CPU to its mapped memory region below 1M to affect
+all four color planes, as well as allowing faster transfers of video data
+from one region to another in video memory.
+
+<P><A NAME="display generation"></A><B>Display Generation</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This portion of the graphics
+hardware is involved in taking the data in the frame buffer, converting
+the pixel or character information stored by the graphics controller, and
+converting it into the analog signals required by the monitor or lcd display.&nbsp;
+The pixel data is first sequenced, or read serially from the frame buffer,
+then converted into analog color information, either by a palette look-up
+table, or by directly converting into red, green, and blue components.&nbsp;
+The CRT controller at the same time adds timing signals that allow the
+monitor to display the analog color information on the display.&nbsp; For
+example, in the VGA these components are made up of the sequencer, attribute
+controller, CRT controller, DAC, and palette table.&nbsp; The sequencer
+reads the information from the frame buffer, and converts it into pixel
+color information, as well as sends signals to the CRT controller such
+that it can provide the timing signals the monitor requires.&nbsp; This
+color information is formatted by the attribute controller in such a way
+that the pixel values can be submitted to the DAC.&nbsp; The DAC then looks
+up these values in its palette table which contains red, green, and blue
+intensities for each of the colors that the attribute controller generates,
+then converts it into an analog signal that is output to the VGA connector
+along with the timing signals generated by the CRT controller.&nbsp; If
+the display is an LCD panel such as found in laptops, the DAC and associated
+support hardware convert the pixel values to signals that the LCD panel
+displays directly.
+
+<P>Notice: All trademarks used or referred to on this page are the property
+of their respective owners.
+<BR>All pages are Copyright &copy; 1997, 1998, J. D. Neal, except where
+noted. Permission for utilization and distribution is subject to the terms
+of the <A HREF="license.htm">FreeVGA Project Copyright License</A>.
+<BR>&nbsp;
+</BODY>
+</HTML>

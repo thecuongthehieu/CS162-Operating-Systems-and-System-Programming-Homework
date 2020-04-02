@@ -1,0 +1,585 @@
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="Author" CONTENT="Joshua Neal">
+   <META NAME="Description" CONTENT="Pure VGA/SVGA hardware programming (registers, identification, and other low-level stuff.)">
+   <META NAME="KeyWords" CONTENT="VGA SVGA hardware video programming">
+   <TITLE>VGA/SVGA Video Programming--Graphics Registers</TITLE>
+</HEAD>
+<BODY>
+
+<CENTER><A HREF="../home.htm">Home</A> <A HREF="vga.htm#register">Back</A>&nbsp;
+<HR WIDTH="100%"><B>Hardware Level VGA and SVGA Video Programming Information
+Page</B></CENTER>
+
+<CENTER>Graphics Registers&nbsp;
+<HR WIDTH="100%"></CENTER>
+
+
+<P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The Graphics Registers are
+accessed via a pair of registers, the Graphics Address Register and the
+Graphics Data Register. See the <A HREF="vgareg.htm">Accessing the VGA
+Registers</A> section for more details. The Address Register is located
+at port 3CEh and the Data Register is located at port 3CFh.
+<UL>
+<LI>
+Index 00h -- Set/Reset Register</LI>
+
+<LI>
+Index 01h -- Enable Set/Reset Register</LI>
+
+<LI>
+Index 02h -- Color Compare Register</LI>
+
+<LI>
+Index 03h -- Data Rotate Register</LI>
+
+<LI>
+Index 04h -- Read Map Select Register</LI>
+
+<LI>
+Index 05h -- <I>Graphics Mode Register</I></LI>
+
+<LI>
+Index 06h -- <I>Miscellaneous Graphics Register</I></LI>
+
+<LI>
+Index 07h -- Color Don't Care Register</LI>
+
+<LI>
+Index 08h -- Bit Mask Register</LI>
+</UL>
+&nbsp;
+<TABLE BORDER WIDTH="600" CELLPADING="2" >
+<CAPTION ALIGN=TOP><A NAME="00"></A><B>Set/Reset Register (Index 00h)</B></CAPTION>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75">7</TD>
+
+<TD WIDTH="75">6</TD>
+
+<TD WIDTH="75">5</TD>
+
+<TD WIDTH="75">4</TD>
+
+<TD WIDTH="75">3</TD>
+
+<TD WIDTH="75">2</TD>
+
+<TD WIDTH="75">1</TD>
+
+<TD WIDTH="75">0</TD>
+</TR>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD COLSPAN="4" WIDTH="300">Set/Reset</TD>
+</TR>
+</TABLE>
+&nbsp;
+<UL>
+<LI>
+<B>Set/Reset</B></LI>
+
+<BR>Bits 3-0 of this field represent planes 3-0 of the VGA display memory.
+This field is used by Write Mode 0 and Write Mode 3 (See the <A HREF="#05">Write
+Mode</A> field.) In Write Mode 0, if the corresponding bit in the <A HREF="#01">Enable
+Set/Reset</A> field is set, and in Write Mode 3 regardless of the <A HREF="#01">Enable
+Set/Reset</A> field, the value of the bit in this field is expanded to
+8 bits and substituted for the data of the respective plane and passed
+to the next stage in the graphics pipeline, which for Write Mode 0 is the
+<A HREF="#03">Logical Operation</A> unit and for Write Mode 3 is the <A HREF="#08">Bit
+Mask</A> unit.</UL>
+&nbsp;
+<TABLE BORDER WIDTH="600" CELLPADING="2" >
+<CAPTION ALIGN=TOP><A NAME="01"></A><B>Enable Set/Reset Register (Index
+01h)</B></CAPTION>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75">7</TD>
+
+<TD WIDTH="75">6</TD>
+
+<TD WIDTH="75">5</TD>
+
+<TD WIDTH="75">4</TD>
+
+<TD WIDTH="75">3</TD>
+
+<TD WIDTH="75">2</TD>
+
+<TD WIDTH="75">1</TD>
+
+<TD WIDTH="75">0</TD>
+</TR>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD COLSPAN="4" WIDTH="300">Enable Set/Reset</TD>
+</TR>
+</TABLE>
+&nbsp;
+<UL>
+<LI>
+<B>Enable Set/Reset</B></LI>
+
+<BR>Bits 3-0 of this field represent planes 3-0 of the VGA display memory.
+This field is used in Write Mode 0 (See the <A HREF="#05">Write Mode</A>
+field) to select whether data for each plane is derived from host data
+or from expansion of the respective bit in the <A HREF="#00">Set/Reset</A>
+field.</UL>
+&nbsp;
+<TABLE BORDER WIDTH="600" CELLPADING="2" >
+<CAPTION ALIGN=TOP><A NAME="02"></A><B>Color Compare Register (Index 02h)</B></CAPTION>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75">7</TD>
+
+<TD WIDTH="75">6</TD>
+
+<TD WIDTH="75">5</TD>
+
+<TD WIDTH="75">4</TD>
+
+<TD WIDTH="75">3</TD>
+
+<TD WIDTH="75">2</TD>
+
+<TD WIDTH="75">1</TD>
+
+<TD WIDTH="75">0</TD>
+</TR>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD COLSPAN="4" WIDTH="300">Color Compare</TD>
+</TR>
+</TABLE>
+&nbsp;
+<UL>
+<LI>
+<B>Color Compare</B></LI>
+
+<BR>Bits 3-0 of this field represent planes 3-0 of the VGA display memory.
+This field holds a reference color that is used by Read Mode 1 (See the
+<A HREF="#05">Read Mode</A> field.) Read Mode 1 returns the result of the
+comparison between this value and a location of display memory, modified
+by the <A HREF="#07">Color Don't Care</A> field.</UL>
+&nbsp;
+<TABLE BORDER WIDTH="600" CELLPADING="2" >
+<CAPTION ALIGN=TOP><A NAME="03"></A><B>Data Rotate Register (Index 03h)</B></CAPTION>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75">7</TD>
+
+<TD WIDTH="75">6</TD>
+
+<TD WIDTH="75">5</TD>
+
+<TD WIDTH="75">4</TD>
+
+<TD WIDTH="75">3</TD>
+
+<TD WIDTH="75">2</TD>
+
+<TD WIDTH="75">1</TD>
+
+<TD WIDTH="75">0</TD>
+</TR>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD COLSPAN="2" WIDTH="150">Logical Operation</TD>
+
+<TD COLSPAN="3" WIDTH="225">Rotate Count</TD>
+</TR>
+</TABLE>
+&nbsp;
+<UL>
+<LI>
+<B>Logical Operation</B></LI>
+
+<BR>This field is used in Write Mode 0 and Write Mode 2 (See the <A HREF="#05">Write
+Mode</A> field.) The logical operation stage of the graphics pipeline is
+32 bits wide (1 byte * 4 planes) and performs the operations on its inputs
+from the previous stage in the graphics pipeline and the latch register.
+The latch register remains unchanged and the result is passed on to the
+next stage in the pipeline. The results based on the value of this field
+are:
+<UL>
+<LI>
+00b - Result is input from previous stage unmodified.</LI>
+
+<LI>
+01b - Result is input from previous stage logical ANDed with latch register.</LI>
+
+<LI>
+10b - Result is input from previous stage logical ORed with latch register.</LI>
+
+<LI>
+11b - Result is input from previous stage logical XORed with latch register.</LI>
+</UL>
+
+<LI>
+<B>Rotate Count</B></LI>
+
+<BR>This field is used in Write Mode 0 and Write Mode 3 (See the <A HREF="#05">Write
+Mode</A> field.) In these modes, the host data is rotated to the right
+by the value specified by the value of this field. A rotation operation
+consists of moving bits 7-1 right one position to bits 6-0, simultaneously
+wrapping bit 0 around to bit 7, and is repeated the number of times specified
+by this field.</UL>
+&nbsp;
+<TABLE BORDER WIDTH="600" CELLPADING="2" >
+<CAPTION ALIGN=TOP><A NAME="04"></A><B>Read Map Select Register (Index
+04h)</B></CAPTION>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75">7</TD>
+
+<TD WIDTH="75">6</TD>
+
+<TD WIDTH="75">5</TD>
+
+<TD WIDTH="75">4</TD>
+
+<TD WIDTH="75">3</TD>
+
+<TD WIDTH="75">2</TD>
+
+<TD WIDTH="75">1</TD>
+
+<TD WIDTH="75">0</TD>
+</TR>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD COLSPAN="2" WIDTH="150">Read Map Select</TD>
+</TR>
+</TABLE>
+&nbsp;
+<UL>
+<LI>
+<B>Read Map Select</B></LI>
+
+<BR>This value of this field is used in Read Mode 0 (see the <A HREF="#05">Read
+Mode</A> field) to specify the display memory plane to transfer data from.
+Due to the arrangement of video memory, this field must be modified four
+times to read one or more pixels values in the planar video modes.</UL>
+&nbsp;
+<TABLE BORDER WIDTH="600" CELLPADING="2" >
+<CAPTION><A NAME="05"></A><B>Graphics Mode Register (Index 05h)</B></CAPTION>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75">7</TD>
+
+<TD WIDTH="75">6</TD>
+
+<TD WIDTH="75">5</TD>
+
+<TD WIDTH="75">4</TD>
+
+<TD WIDTH="75">3</TD>
+
+<TD WIDTH="75">2</TD>
+
+<TD WIDTH="75">1</TD>
+
+<TD WIDTH="75">0</TD>
+</TR>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75">Shift256</TD>
+
+<TD>Shift Reg.</TD>
+
+<TD WIDTH="75">Host O/E</TD>
+
+<TD WIDTH="75">Read Mode</TD>
+
+<TD WIDTH="75"></TD>
+
+<TD COLSPAN="2" WIDTH="150">Write Mode</TD>
+</TR>
+</TABLE>
+&nbsp;
+<UL>
+<LI>
+<B>Shift256 -- 256-Color Shift Mode<BR>
+</B>"<I>When set to 0, this bit allows bit 5 to control the loading of
+the shift registers. When set to 1, this bit causes the shift registers
+to be loaded in a manner that supports the 256-color mode.</I>"</LI>
+
+<BR><B>Shift Reg. -- Shift Register Interleave Mode<BR>
+</B>"<I>When set to 1, this bit directs the shift registers in the graphics
+controller to format the serial data stream with even-numbered bits from
+both maps on even-numbered maps, and odd-numbered bits from both maps on
+the odd-numbered maps. This bit is used for modes 4 and 5.</I>"
+<BR><B>Host O/E -- Host Odd/Even Memory Read Addressing Enable<BR>
+</B>"<I>When set to 1, this bit selects the odd/even addressing mode used
+by the IBM Color/Graphics Monitor Adapter. Normally, the value here follows
+the value of Memory Mode register bit 2 in the sequencer.</I>"
+<LI>
+<B>Read Mode</B></LI>
+
+<BR>This field selects between two read modes, simply known as Read Mode
+0, and Read Mode 1, based upon the value of this field:
+<UL>
+<LI>
+0b -- Read Mode 0: In this mode, a byte from one of the four planes is
+returned on read operations. The plane from which the data is returned
+is determined by the value of the <A HREF="#04">Read Map Select</A> field.</LI>
+</UL>
+
+<LI>
+1b -- Read Mode 1: In this mode, a comparison is made between display memory
+and a reference color defined by the <A HREF="#02">Color Compare</A> field.
+Bit planes not set in the <A HREF="#07">Color Don't Care</A> field then
+the corresponding color plane is not considered in the comparison. Each
+bit in the returned result represents one comparison between the reference
+color, with the bit being set if the comparison is true.</LI>
+
+<LI>
+<B>Write Mode</B></LI>
+
+<BR>This field selects between four write modes, simply known as Write
+Modes 0-3, based upon the value of this field:
+<UL>
+<LI>
+00b -- Write Mode 0: In this mode, the host data is first rotated as per
+the <A HREF="#03">Rotate Count</A> field, then the <A HREF="#01">Enable
+Set/Reset</A> mechanism selects data from this or the <A HREF="#00">Set/Reset</A>
+field. Then the selected <A HREF="#03">Logical Operation</A> is performed
+on the resulting data and the data in the latch register. Then the <A HREF="#08">Bit
+Mask</A> field is used to select which bits come from the resulting data
+and which come from the latch register. Finally, only the bit planes enabled
+by the <A HREF="seqreg.htm#02">Memory Plane Write Enable</A> field are
+written to memory.</LI>
+
+<LI>
+01b -- Write Mode 1: In this mode, data is transferred directly from the
+32 bit latch register to display memory, affected only by the <A HREF="seqreg.htm#02">Memory
+Plane Write Enable</A> field. The host data is not used in this mode.</LI>
+
+<LI>
+10b -- Write Mode 2: In this mode, the bits 3-0 of the host data are replicated
+across all 8 bits of their respective planes. Then the selected <A HREF="#03">Logical
+Operation</A> is performed on the resulting data and the data in the latch
+register. Then the <A HREF="#08">Bit Mask</A> field is used to select which
+bits come from the resulting data and which come from the latch register.
+Finally, only the bit planes enabled by the <A HREF="seqreg.htm#02">Memory
+Plane Write Enable</A> field are written to memory.</LI>
+
+<LI>
+11b -- Write Mode 3: In this mode, the data in the <A HREF="#00">Set/Reset</A>
+field is used as if the <A HREF="#01">Enable Set/Reset</A> field were set
+to 1111b. Then the host data is first rotated as per the <A HREF="#03">Rotate
+Count</A> field, then logical ANDed with the value of the <A HREF="#08">Bit
+Mask</A> field. The resulting value is used on the data obtained from the
+Set/Reset field in the same way that the <A HREF="#08">Bit Mask</A> field
+would ordinarily be used. to select which bits come from the expansion
+of the <A HREF="#00">Set/Reset</A> field and which come from the latch
+register. Finally, only the bit planes enabled by the <A HREF="seqreg.htm#02">Memory
+Plane Write Enable</A> field are written to memory.</LI>
+</UL>
+</UL>
+&nbsp;
+<TABLE BORDER WIDTH="600" CELLPADING="2" >
+<CAPTION ALIGN=TOP><A NAME="06"></A><B>Miscellaneous Graphics Register
+(Index 06h)</B></CAPTION>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75">7</TD>
+
+<TD WIDTH="75">6</TD>
+
+<TD WIDTH="75">5</TD>
+
+<TD WIDTH="75">4</TD>
+
+<TD WIDTH="75">3</TD>
+
+<TD WIDTH="75">2</TD>
+
+<TD WIDTH="75">1</TD>
+
+<TD WIDTH="75">0</TD>
+</TR>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD COLSPAN="2" WIDTH="150">Memory Map Select</TD>
+
+<TD WIDTH="75">Chain O/E</TD>
+
+<TD WIDTH="75">Alpha Dis.</TD>
+</TR>
+</TABLE>
+&nbsp;
+<UL>
+<LI>
+<B>Memory Map Select<BR>
+</B>This field specifies the range of host memory addresses that is decoded
+by the VGA hardware and mapped into display memory accesses.&nbsp; The
+values of this field and their corresponding host memory ranges are:</LI>
+
+<UL>
+<LI>
+00b -- A0000h-BFFFFh (128K region)</LI>
+
+<LI>
+01b -- A0000h-AFFFFh (64K region)</LI>
+
+<LI>
+10b -- B0000h-B7FFFh (32K region)</LI>
+
+<LI>
+11b -- B8000h-BFFFFh (32K region)</LI>
+</UL>
+<B>Chain O/E -- Chain Odd/Even Enable<BR>
+</B>"<I>When set to 1, this bit directs the system address bit, A0, to
+be replaced by a higher-order bit. The odd map is then selected when A0
+is 1, and the even map when A0 is 0.</I>"
+<BR><B>Alpha Dis. -- Alphanumeric Mode Disable<BR>
+</B>"<I>This bit controls alphanumeric mode addressing. When set to 1,
+this bit selects graphics modes, which also disables the character generator
+latches."</I></UL>
+&nbsp;
+<TABLE BORDER WIDTH="600" CELLPADING="2" >
+<CAPTION ALIGN=TOP><A NAME="07"></A><B>Color Don't Care Register (Index
+07h)</B></CAPTION>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75">7</TD>
+
+<TD WIDTH="75">6</TD>
+
+<TD WIDTH="75">5</TD>
+
+<TD WIDTH="75">4</TD>
+
+<TD WIDTH="75">3</TD>
+
+<TD WIDTH="75">2</TD>
+
+<TD WIDTH="75">1</TD>
+
+<TD WIDTH="75">0</TD>
+</TR>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD COLSPAN="4" WIDTH="300">Color Don't Care</TD>
+</TR>
+</TABLE>
+&nbsp;
+<UL>
+<LI>
+<B>Color Don't Care</B></LI>
+
+<BR>Bits 3-0 of this field represent planes 3-0 of the VGA display memory.
+This field selects the planes that are used in the comparisons made by
+Read Mode 1 (See the <A HREF="#05">Read Mode</A> field.) Read Mode 1 returns
+the result of the comparison between the value of the <A HREF="#02">Color
+Compare</A> field and a location of display memory. If a bit in this field
+is set, then the corresponding display plane is considered in the comparison.
+If it is not set, then that plane is ignored for the results of the comparison.</UL>
+&nbsp;
+<TABLE BORDER WIDTH="600" CELLPADING="2" >
+<CAPTION ALIGN=TOP><A NAME="08"></A><B>Bit Mask Register (Index 08h)</B></CAPTION>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75">7</TD>
+
+<TD WIDTH="75">6</TD>
+
+<TD WIDTH="75">5</TD>
+
+<TD WIDTH="75">4</TD>
+
+<TD WIDTH="75">3</TD>
+
+<TD WIDTH="75">2</TD>
+
+<TD WIDTH="75">1</TD>
+
+<TD WIDTH="75">0</TD>
+</TR>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD COLSPAN="8" WIDTH="600">Bit Mask</TD>
+</TR>
+</TABLE>
+&nbsp;
+<UL>
+<LI>
+<B>Bit Mask</B></LI>
+
+<BR>This field is used in Write Modes 0, 2, and 3 (See the <A HREF="#05">Write
+Mode</A> field.) It it is applied to one byte of data in all four display
+planes. If a bit is set, then the value of corresponding bit from the previous
+stage in the graphics pipeline is selected; otherwise the value of the
+corresponding bit in the latch register is used instead. In Write Mode
+3, the incoming data byte, after being rotated is logical ANDed with this
+byte and the resulting value is used in the same way this field would normally
+be used by itself.</UL>
+Notice: All trademarks used or referred to on this page are the property
+of their respective owners.
+<BR>All pages are Copyright &copy; 1997, 1998, J. D. Neal, except where
+noted. Permission for utilization and distribution is subject to the terms
+of the <A HREF="license.htm">FreeVGA Project Copyright License</A>.
+</BODY>
+</HTML>

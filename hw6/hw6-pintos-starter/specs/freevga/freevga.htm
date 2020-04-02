@@ -1,0 +1,255 @@
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="Author" CONTENT="Joshua Neal">
+   <META NAME="Description" CONTENT="Pure VGA/SVGA hardware programming (registers, identification, and otherlow-level stuff.)">
+   <META NAME="KeyWords" CONTENT="VGA SVGA hardware video programming">
+   <TITLE>FreeVGA--About the FreeVGA Project</TITLE>
+</HEAD>
+<BODY>
+
+<CENTER><A HREF="home.htm">Home</A> <A HREF="#intro">Intro</A> <A HREF="#completeness">Completeness</A>
+<A HREF="#contrib">Contribution</A> <A HREF="#membership">Membership</A>
+<A HREF="#questions">Questions</A> <A HREF="home.htm">Back</A>&nbsp;
+<HR WIDTH="100%"><B>Hardware Level VGA and SVGA Video Programming Information
+Page</B></CENTER>
+
+<CENTER>About the FreeVGA Project&nbsp;
+<HR WIDTH="100%"></CENTER>
+
+
+<P><A NAME="intro"></A><B>Introduction</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; As a software programmer
+for the PC architecture I have noticed that there is plenty of free information
+existing on the Internet for programming PC hardware, with the notable
+exception of video adapters, MPEG cards and the like. When the VGA was
+the standard adapter card in PC's, programming was relatively straightforward.
+However, when SVGA adapters appeared on the market, there was little standardization
+between separate vendor's products. For this reason, applications and graphical
+user interface systems required specialized drivers to utilize the extended
+capabilities of the SVGA adapters. Either these specialized drivers were
+written by the video card vendor or they had to be written by the application
+vendor. Unfortunately due to the cost of specifications and complexity
+of hardware, most free or shareware programs supported only the standard
+VGA. The goal of this project, under my direction, is to explore the area
+of low-level video programming and provide information for programmers
+of free software throughout the world.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; With the growing popularity
+of the free software concept, more and more specialized applications are
+written every day. Many of these applications could take advantage of the
+specialized features of the video hardware but often the information required
+is not available. This projects goal is to make that information available
+By gaining the cooperation of both programmers and hardware manufacturers
+an excellent reference can be developed. Internet technology makes it possible
+to provide a free resource updated in a timely fashion as opposed to printed
+matter which takes time to print and deliver.
+
+<P><A NAME="completeness"></A><B>Completeness</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Why would a low-level programmer
+need this reference rather than simply use datasheets and chipset specifications
+from the manufacturers themselves? First, the manufacturers may no longer
+provide literature on "obsolete" chipsets. Second, such datasheets are
+often aimed at hardware designers rather than programmers. Programmers
+are trying to implement software on existing hardware rather design hardware.
+Many of the details needed to program the hardware are dependent on the
+implementation of the video adapter. Datasheets typically only provide
+information on one particular component of the video hardware. It is necessary
+to understand how the components in the adapter are "wired" together to
+be able to program the adapter. This information is rarely found in datasheets
+or manufacturer's documentation. Third, as demonstrated on the VGA and
+some specific SVGA hardware, there are always programmers who can find
+ways to cleverly program the hardware to provide capabilities unimagined
+by the manufacturer. To do this, it requires the programmer to have intimate
+knowledge of the hardware, as BIOS services provide a "lowest common denominator"
+of capability.
+
+<P><A NAME="contrib"></A><B>Contribution</B>
+<BR><B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </B>This section is for
+those interested in contributing to the FreeVGA Project. The primary objective
+of this project is to gather information about video hardware, to verify
+this information as best as possible, then to organize the information
+in a form usable for any application, and finally to make this information
+freely available to all programmers. Because of the non-profit nature of
+this project, all information provided is the result of generous contribution
+by myself or others. The primary resources required by this project are:
+chipset datasheets/documentation, developer kits for video boards, video
+adapter boards used for testing and verifying information, and finally
+"postcards from the bleeding edge" i.e. information about the real world
+problems and their workarounds from video programmers. If you can provide
+any of these resources to the project or any other related assistance myself
+and other programmers who benefit give thanks to your generosity. Your
+name will be forever enshrined on the list of contributors, along with
+a link to your homepage if you so desire.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp; I can be reached via the <A HREF="feedback.htm">feedback
+form</A>. If you wish to donate hardware or documentation, please send
+it, along with your name and the link you wish to include in the list of
+contributors to:
+
+<P>Joshua Neal
+<BR>FreeVGA Project
+<BR>925 N. Coronado Dr.
+<BR>Gilbert, AZ 85234
+
+<P><A NAME="membership"></A><B>Membership</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Because of the nature of
+this project, any contributor can consider themselves a member if they
+wish to do so. As the founder of this project I am willing to donate my
+time and resources to ensuring the continuing organization, accuracy, and
+usability of the FreeVGA Project's documentation. I will continue to do
+this indefinitely, although if the task becomes overwhelming I will solicit
+volunteers to assist with the project. There may at some point in the future
+be special considerations for vendors that choose to support the projects
+goals.
+
+<P><A NAME="questions"></A><B>Open-Ended Questions</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The problem of documenting
+video card operation and behavior is difficult because of the large amount
+of information available, and because video hardware is constantly evolving,
+making documentation a problem of hitting a moving target. Another problem
+is that because video cards are projects of human endeavor and due to their
+complexity, their implementation often differs from published specifications.
+Even two manufacturer's products based upon the same chipset can contain
+enough variation to make them separate cases from a programmer's viewpoint.
+The FreeVGA Project attempts to provide answers to the following questions:
+<UL>
+<LI>
+<B>How does one detect what VGA/SVGA adapter is present even when no access
+to BIOS is available?</B></LI>
+</UL>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Because video hardware was developed
+by many independent vendors along separate evolutionary paths, there is
+very little knowledge about how to identify the particular model of video
+card present in a machine. Because identifying the particular model is
+crucial to utilizing the advanced features of a specific model, this is
+an important task that nearly all software written for the SVGA needs to
+perform. In many cases, such as when writing programs under an operating
+system other than MS-DOS/Windows, it may not be possible nor is it good
+practice to access BIOS for determining the specific model. Furthermore,
+the more recent PCI bus design is being incorporated into many systems
+with non-80x86 chips, such as the PowerPC, Alpha, and even high end workstations.
+However, the manufacturers of the hardware may only support Mac and PC
+versions of their cards, considering other platforms too much of a niche
+market to support. Since their inception in the PC market, most video cards
+have had the capability to work with another card (albeit different) in
+the same machine. Some newer PCI cards allow multiple cards to be used
+in one machine. Until recently this capability has been unsupported by
+operating systems and programs. For debugging video routines there is no
+equal to having a second monitor attached--one monitor can display the
+program's output while the other provides the debugging interface. Note
+that the need for a second monitor could be reduced somewhat if better
+virtualization of the display hardware was implemented. This project aims
+to give programmers the skills and knowledge to better utilize the video
+hardware.
+<UL>
+<LI>
+<B>How does one perform standard video operations on a particular card
+without utilizing the video BIOS interface?</B></LI>
+</UL>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BIOS was designed to support
+MS-DOS programs on the 8086. Computers have progressed far beyond that
+point but BIOS has remained basically the same (with the exception of VESA
+BIOS.) Even then, most facilities provided by the video BIOS are not particularly
+useful. An example is the BIOS Read and Write Pixel commands. These are
+the only BIOS provided method of accessing video memory other than text
+functions. Anyone like myself who started learning 8086 assembler to speed
+up their graphics discovered this function, and said "Cool. This is going
+to be easy." I then ran my first program and discovered that I had just
+lost a few orders of magnitude of performance. Thus I started to learn
+to interact with the video card hardware directly. VESA BIOS is better,
+although I have seen very few on-board implementations that work properly
+(if present), usually resulting in the user having to run a TSR program
+that provides VESA services in RAM. While VESA BIOS does provide some facilities
+for non-real mode problems it still does place a function call penalty
+on video code. My biggest complaint is that with VESA BIOS you are restricted
+to programming to the lowest common denominator of all video hardware,
+and thus to utilize any special features of a chipset, you still have to
+learn to program the card directly. Many video cards are now considered
+"obsolete" by their manufacturer (or the manufacturer has joined the great
+corporation in the sky...) and developer support is no longer available.
+The unfortunate problem is that these "obsolete" cards are the same cards
+being used by non-profit organizations and schools who could otherwise
+reap the benefits of a wide variety of free software.
+<UL>
+<LI>
+<B>What are the specialized hardware features (2D/3D acceleration, hardware
+cursor, video acceleration, etc.) does a particular card have and how does
+one utilize these features?</B></LI>
+</UL>
+<B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </B>This is probably the area where
+the documentation is most important. These features are programmed differently
+on each vendor's video hardware, but can improve the performance of a particular
+application by several orders of magnitude. Programmers such as video game
+programmers and assembly demo programmers have demonstrated that by pushing
+hardware to its limits, previously inconceivable animation and special
+effects are possible. Recent advances in 3D acceleration have made virtual
+reality on the desktop a possibility. It is crucial to developers that
+they be able to thoroughly understand the hardware's operation to maximize
+its performance.
+<UL>
+<LI>
+<B>What are the differences between specific implementations of particular
+chipsets, and if so how does one write software that works with these differences?</B></LI>
+</UL>
+<B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </B>Even programmers programming for
+the relatively standard VGA hardware can run into problems in this area.
+This is the reason so many packages state support for IBM VGA or 100% compatible.
+Frequently programmers encounter slight differences in hardware that, under
+specific circumstances can cause their programs to fail to operate properly.
+If programmers had detailed documentation of the hardware differences of
+specific implementations, programmers could, and are generally willing
+to, write workarounds in their code in order to provide support for this
+hardware. Occasionally subtle hardware problems arise in a particular version
+of a board and is corrected in a later revision (possibly by simply revising
+the BIOS.) It is important to recognize the earlier version and be able
+to write software that can deal with its particular problem. In addition,
+many chipsets are designed in such a way that they can work with a variety
+of support devices such as clock generators and Video DACs. It is important
+to know how to detect and control these support devices, which may (and
+usually is) be different in every implementation. Some of these devices
+could be interchanged with pin-compatible devices which could provide additional
+functionality. However, this would require special programming to utilize
+the device's features.
+<UL>
+<LI>
+<B>How does one perform diagnostics on a particular video card in order
+to identify inoperative, semi-inoperative, and improperly configured hardware?</B></LI>
+</UL>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; While testing and verifying the operation
+of various video boards. I discovered some cards that did not respond properly
+to my programming. My initial thought was that I was doing something wrong
+and tried to figure out what was wrong. However, further testing on another
+identical card demonstrated that the first board had simply failed. There
+is little diagnostic software for the VGA and SVGA adapters particularly
+when dealing with some of the more esoteric features. This is primarily
+because little has been identified about the correct behavior of video
+cards. Many manufacturers fail to include a thorough diagnostics utility
+with their hardware, and the diagnostics that are provided are usually
+specific to one operating system.
+<UL>
+<LI>
+<B>How does one properly emulate a particular VGA/SVGA adapter in order
+to properly implement compatibility for legacy full-screen applications?</B></LI>
+</UL>
+<B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </B>This is a particular
+are of interest to myself and others. This knowledge can be used to create
+a virtual machine capable of multitasking legacy applications. Particular
+features that could be provided are the ability to execute a full-screen
+program in the background, execute a full-screen program in a virtual window
+on a desktop, emulate a particular video adapter and translate its output
+to a form compatible with the hardware on the machine, provide the ability
+to remotely view an applications screen across a network, provide the ability
+to debug a full-screen application without having to use a dual monitor
+system or attached text terminal. Huge benefits can be reaped, but all
+of the details of a particular hardware configuration must be known for
+proper emulation/virtualization. For example, programs that attempt to
+autodetect the hardware often rely on undocumented behaviors of video adapters.
+These undocumented behaviors must be emulated properly for the application
+to work properly.
+
+<P>Notice: All trademarks used or referred to on this page are the property
+of their respective owners.
+<BR>All pages are Copyright &copy; 1997, 1998, J. D. Neal, except where
+noted. Permission for utilization and distribution is subject to the terms
+of the <A HREF="license.htm">FreeVGA Project Copyright License</A>.&nbsp;<IMG SRC="http://www.goodnet.com/~tinara/cgi-bin/imgserv.cgi?logo2.gif" >
+</BODY>
+</HTML>

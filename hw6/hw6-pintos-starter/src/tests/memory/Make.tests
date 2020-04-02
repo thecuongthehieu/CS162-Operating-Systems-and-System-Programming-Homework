@@ -1,0 +1,60 @@
+# -*- makefile -*-
+
+tests/%.output: FILESYSSOURCE = --filesys-size=2
+tests/%.output: PUTFILES = $(filter-out kernel.bin loader.bin, $^)
+
+tests/memory_TESTS = $(addprefix tests/memory/,sbrk-page sbrk-small sbrk-none \
+sbrk-multi sbrk-zero sbrk-rv sbrk-large sbrk-mebi sbrk-fail-1 sbrk-fail-2 \
+sbrk-dealloc sbrk-many sbrk-counter sbrk-oom-1 sbrk-oom-2 \
+malloc-simple malloc-free malloc-fit malloc-fail malloc-merge-1 \
+malloc-merge-2 malloc-null realloc-1 realloc-2 realloc-3 realloc-null \
+pt-grow-stack pt-grow-pusha pt-grow-bad pt-big-stk-obj pt-bad-addr \
+pt-bad-read pt-write-code pt-write-code2 pt-grow-stk-sc pt-stk-oflow)
+
+tests/memory_PROGS = $(tests/memory_TESTS)
+
+# I avoided tests/main.c to minimize dependency on the userprog project.
+tests/memory/sbrk-page_SRC = tests/memory/sbrk-simple.c tests/memory/sbrk-page.c
+tests/memory/sbrk-small_SRC = tests/memory/sbrk-simple.c tests/memory/sbrk-small.c
+tests/memory/sbrk-none_SRC = tests/memory/sbrk-simple.c tests/memory/sbrk-none.c
+tests/memory/sbrk-multi_SRC = tests/memory/sbrk-simple.c tests/memory/sbrk-multi.c
+tests/memory/sbrk-zero_SRC = tests/memory/sbrk-zero.c
+tests/memory/sbrk-rv_SRC = tests/memory/sbrk-rv.c
+tests/memory/sbrk-large_SRC = tests/memory/sbrk-large.c
+tests/memory/sbrk-mebi_SRC = tests/memory/sbrk-mebi.c
+tests/memory/sbrk-fail-1_SRC = tests/memory/sbrk-fail-1.c
+tests/memory/sbrk-fail-2_SRC = tests/memory/sbrk-fail-2.c
+tests/memory/sbrk-dealloc_SRC = tests/memory/sbrk-dealloc.c
+tests/memory/sbrk-many_SRC = tests/memory/sbrk-many.c
+tests/memory/sbrk-counter_SRC = tests/memory/sbrk-counter.c
+tests/memory/sbrk-oom-1_SRC = tests/memory/sbrk-oom.c tests/memory/sbrk-oom-1.c
+tests/memory/sbrk-oom-2_SRC = tests/memory/sbrk-oom.c tests/memory/sbrk-oom-2.c
+tests/memory/malloc-simple_SRC = tests/memory/malloc-simple.c
+tests/memory/malloc-free_SRC = tests/memory/malloc-free.c
+tests/memory/malloc-fit_SRC = tests/memory/malloc-fit.c
+tests/memory/malloc-fail_SRC = tests/memory/malloc-fail.c
+tests/memory/malloc-merge-1_SRC = tests/memory/malloc-merge-1.c
+tests/memory/malloc-merge-2_SRC = tests/memory/malloc-merge-2.c
+tests/memory/malloc-null_SRC = tests/memory/malloc-null.c
+tests/memory/realloc-1_SRC = tests/memory/realloc-1.c
+tests/memory/realloc-2_SRC = tests/memory/realloc-2.c
+tests/memory/realloc-3_SRC = tests/memory/realloc-3.c
+tests/memory/realloc-null_SRC = tests/memory/realloc-null.c
+tests/memory/pt-grow-stack_SRC = tests/memory/pt-grow-stack.c tests/arc4.c	\
+tests/cksum.c
+tests/memory/pt-grow-pusha_SRC = tests/memory/pt-grow-pusha.c
+tests/memory/pt-grow-bad_SRC = tests/memory/pt-grow-bad.c
+tests/memory/pt-big-stk-obj_SRC = tests/memory/pt-big-stk-obj.c tests/arc4.c	\
+tests/cksum.c
+tests/memory/pt-bad-addr_SRC = tests/memory/pt-bad-addr.c
+tests/memory/pt-bad-read_SRC = tests/memory/pt-bad-read.c
+tests/memory/pt-write-code_SRC = tests/memory/pt-write-code.c
+tests/memory/pt-write-code2_SRC = tests/memory/pt-write-code-2.c
+tests/memory/pt-grow-stk-sc_SRC = tests/memory/pt-grow-stk-sc.c
+tests/memory/pt-stk-oflow_SRC = tests/memory/pt-stk-oflow.c
+
+$(foreach prog,$(tests/memory_PROGS),$(eval $(prog)_SRC += tests/lib.c))
+
+tests/memory/pt-grow-stk-sc_PUTFILES = tests/memory/sample.txt
+tests/memory/pt-bad-read_PUTFILES = tests/memory/sample.txt
+tests/memory/pt-write-code2_PUTFILES = tests/memory/sample.txt

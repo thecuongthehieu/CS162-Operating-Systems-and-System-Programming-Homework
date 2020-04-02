@@ -1,0 +1,154 @@
+@node Bibliography
+@unnumbered Bibliography
+
+@macro bibdfn{cite}
+@noindent @anchor{\cite\}
+[\cite\].@w{  }
+@end macro
+
+@menu
+* Hardware References::     
+* Software References::     
+* Operating System Design References::
+@end menu
+
+@node Hardware References
+@section Hardware References
+
+@bibdfn{IA32-v1}
+IA-32 Intel Architecture Software Developer's Manual Volume 1: Basic
+Architecture.  Basic 80@var{x}86 architecture and programming
+environment.  Available via @uref{developer.intel.com}.  Section numbers
+in this document refer to revision 18.
+
+@bibdfn{IA32-v2a} 
+IA-32 Intel Architecture Software Developer's Manual
+Volume 2A: Instruction Set Reference A-M.  80@var{x}86 instructions
+whose names begin with A through M.  Available via
+@uref{developer.intel.com}.  Section numbers in this document refer to
+revision 18.
+
+@bibdfn{IA32-v2b}
+IA-32 Intel Architecture Software Developer's Manual Volume 2B:
+Instruction Set Reference N-Z.  80@var{x}86 instructions whose names
+begin with N through Z.  Available via @uref{developer.intel.com}.
+Section numbers in this document refer to revision 18.
+
+@bibdfn{IA32-v3a}
+IA-32 Intel Architecture Software Developer's Manual Volume 3A: System
+Programming Guide.  Operating system support, including segmentation,
+paging, tasks, interrupt and exception handling.  Available via
+@uref{developer.intel.com}.  Section numbers in this document refer to
+revision 18.
+
+@bibdfn{FreeVGA}
+@uref{specs/freevga/home.htm, , FreeVGA Project}.  Documents the VGA video
+hardware used in PCs.
+
+@bibdfn{kbd}
+@uref{specs/kbd/scancodes.html, , Keyboard scancodes}.  Documents PC keyboard
+interface.
+
+@bibdfn{ATA-3}
+@uref{specs/ata-3-std.pdf, , AT Attachment-3 Interface (ATA-3) Working
+Draft}.  Draft of an old version of the ATA aka IDE interface for the
+disks used in most desktop PCs.
+
+@bibdfn{PC16550D}
+@uref{specs/pc16550d.pdf, , National Semiconductor PC16550D Universal
+Asynchronous Receiver/Transmitter with FIFOs}.  Datasheet for a chip
+used for PC serial ports.
+
+@bibdfn{8254}
+@uref{specs/8254.pdf, , Intel 8254 Programmable Interval Timer}.
+Datasheet for PC timer chip.
+
+@bibdfn{8259A}
+@uref{specs/8259A.pdf, , Intel 8259A Programmable Interrupt Controller
+(8259A/8259A-2)}.  Datasheet for PC interrupt controller chip.
+
+@bibdfn{MC146818A}
+@uref{specs/mc146818a.pdf, , Motorola MC146818A Real Time Clock Plus
+Ram (RTC)}.  Datasheet for PC real-time clock chip.
+
+@node Software References
+@section Software References
+
+@bibdfn{ELF1}
+@uref{specs/elf.pdf, , Tool Interface Standard (TIS) Executable and
+Linking Format (ELF) Specification Version 1.2 Book I: Executable and
+Linking Format}.  The ubiquitous format for executables in modern Unix
+systems.
+
+@bibdfn{ELF2}
+@uref{specs/elf.pdf, , Tool Interface Standard (TIS) Executable and
+Linking Format (ELF) Specification Version 1.2 Book II: Processor
+Specific (Intel Architecture)}.  80@var{x}86-specific parts of ELF.
+
+@bibdfn{ELF3}
+@uref{specs/elf.pdf, , Tool Interface Standard (TIS) Executable and
+Linking Format (ELF) Specification Version 1.2 Book III: Operating
+System Specific (UNIX System V Release 4)}.  Unix-specific parts of
+ELF.
+
+@bibdfn{SysV-ABI}
+@uref{specs/sysv-abi-4.1.pdf, , System V Application Binary Interface:
+Edition 4.1}.  Specifies how applications interface with the OS under
+Unix.
+
+@bibdfn{SysV-i386}
+@uref{specs/sysv-abi-i386-4.pdf, , System V Application Binary 
+Interface: Intel386 Architecture Processor Supplement: Fourth
+Edition}.  80@var{x}86-specific parts of the Unix interface.
+
+@bibdfn{SysV-ABI-update}
+@uref{specs/sysv-abi-update.html/contents.html, , System V Application Binary
+Interface---DRAFT---24 April 2001}.  A draft of a revised version of
+@bibref{SysV-ABI} which was never completed.
+
+@bibdfn{SUSv3}
+The Open Group, @uref{http://www.unix.org/single_unix_specification/,
+, Single UNIX Specification V3}, 2001.
+
+@bibdfn{Partitions}
+A.@: E.@: Brouwer, @uref{specs/partitions/partition_tables.html, ,
+Minimal partition table specification}, 1999.
+
+@bibdfn{IntrList}
+R.@: Brown, @uref{http://www.ctyme.com/rbrown.htm, , Ralf Brown's
+Interrupt List}, 2000.
+
+@node Operating System Design References
+@section Operating System Design References
+
+@bibdfn{Christopher}
+W.@: A.@: Christopher, S.@: J.@: Procter, T.@: E.@: Anderson,
+@cite{The Nachos instructional operating system}.
+Proceedings of the @acronym{USENIX} Winter 1993 Conference.
+@uref{http://portal.acm.org/citation.cfm?id=1267307}.
+
+@bibdfn{Dijkstra}
+E.@: W.@: Dijkstra, @cite{The structure of the ``THE''
+multiprogramming system}.  Communications of the ACM 11(5):341--346,
+1968.  @uref{http://doi.acm.org/10.1145/363095.363143}.
+
+@bibdfn{Hoare}
+C.@: A.@: R.@: Hoare, @cite{Monitors: An Operating System
+Structuring Concept}.  Communications of the ACM, 17(10):549--557,
+1974.  @uref{http://www.acm.org/classics/feb96/}.
+
+@bibdfn{Lampson}
+B.@: W.@: Lampson, D.@: D.@: Redell, @cite{Experience with processes and
+monitors in Mesa}.  Communications of the ACM, 23(2):105--117, 1980.
+@uref{http://doi.acm.org/10.1145/358818.358824}.
+
+@bibdfn{McKusick}
+M.@: K.@: McKusick, K.@: Bostic, M.@: J.@: Karels, J.@: S.@: Quarterman,
+@cite{The Design and Implementation of the 4.4@acronym{BSD} Operating
+System}.  Addison-Wesley, 1996.
+
+@bibdfn{Wilson}
+P.@: R.@: Wilson, M.@: S.@: Johnstone, M.@: Neely, D.@: Boles,
+@cite{Dynamic Storage Allocation: A Survey and Critical Review}.
+International Workshop on Memory Management, 1995.
+@uref{http://www.cs.utexas.edu/users/oops/papers.html#allocsrv}.
