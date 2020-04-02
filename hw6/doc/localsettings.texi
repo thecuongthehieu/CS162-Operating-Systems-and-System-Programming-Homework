@@ -1,0 +1,64 @@
+@c Local settings
+
+@set gitrepo file:///usr/class/cs140/winter13/pintos/.git
+@set localpintoshttppath http://@/www.stanford.edu/@/class/@/cs140/@/pintos/@/pintos.@/tar.gz
+@set localpintosbindir /usr/class/cs140/`uname -m`/bin
+
+@set recommendvnc
+@set recommendgit
+@clear recommendcygwin
+@clear recommendcvs
+
+@macro localmachines{}
+The CS 140 ``officially supported'' Pintos development machines are
+those in the myth, corn, and cardinal clusters.
+@end macro
+
+@macro localpathsetup{}
+Under @command{csh}, Stanford's login shell, you can do so
+with this command:@footnote{The term @samp{`uname -m`} expands to a value
+such as @file{x86_64} that indicates the type of computer you're
+logged into.}
+@example
+set path = ( @value{localpintosbindir} $path )
+@end example
+@noindent
+@strong{Notice that both @samp{`} are left single quotes or
+``backticks,'' not apostrophes (@samp{'}).}
+It is a good idea to add this line to the @file{.cshrc} file
+in your home directory.  Otherwise, you'll have to type it every time
+you log in.
+@end macro
+
+@macro localcrossbuild{}
+@end macro
+
+@macro localhonorcodepolicy{}
+In the context of Stanford's CS 140 course, please respect the spirit
+and the letter of the honor code by refraining from reading any homework
+solutions available online or elsewhere.  Reading the source code for
+other operating system kernels, such as Linux or FreeBSD, is allowed,
+but do not copy code from them literally.  Please cite the code that
+inspired your own in your design documentation.
+@end macro
+
+@macro localcredits{}
+@c none needed
+@end macro
+
+@macro localcvspolicy{}
+Instead, we recommend integrating your team's changes early and often,
+using a source code control system such as Git (@pxref{Git}).
+This is less likely to produce surprises, because everyone can see
+everyone else's code as it is written, instead of just when it is
+finished.  These systems also make it possible to review changes and,
+when a change introduces a bug, drop back to working versions of code.
+@end macro
+
+@macro localcodingstandards{}
+@c If appropriate, describe additional local coding standards here.
+@end macro
+
+@macro localdevelopmenttools{}
+@c Descriptions of additional, local development tools can be inserted here
+@end macro
