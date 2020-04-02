@@ -1,0 +1,200 @@
+<html>
+<title>Revision History</title>
+<h1>Revision History</h1>
+<h3>First draft published May 14, 1998.</h3>
+<h3>Second draft published May 3, 1999.</h3>
+<ul>
+<li>
+New values introduced for ELF header <a href=ch4.eheader.html#e_machine><code>e_machine</code></a> field.
+<li>
+Revised language for <a href=ch4.eheader.html#osabi><code>EI_OSABI</code></a> and <a href=ch4.eheader.html#abiversion><code>EI_ABIVERSION</code></a>
+fields of the ELF header <code>e_ident</code> array.
+<li>
+New section flags <a href=ch4.sheader.html#shf_merge><code>SHF_MERGE</code></a> and <a href=ch4.sheader.html#shf_strings><code>SHF_STRINGS</code></a>
+added.
+<li>
+New values added to a symbol table entry's 
+<a href=ch4.symtab.html#st_other><code>st_other</code></a>
+field to describe a symbol's
+<a href=ch4.symtab.html#visibility>visibility</a>.
+<li>
+New dynamic section tags <a href=ch5.dynamic.html#dt_runpath><code>DT_RUNPATH</code></a> 
+and <a href=ch5.dynamic.html#df_flags><code>DT_FLAGS</code></a> added.
+Dynamic section tag <a href=ch5.dynamic.html#dt_rpath>
+<code>DT_RPATH</code></a> moved to level 2.
+<li>
+New semantics for <a href=ch5.dynamic.html#shobj_dependencies>shared 
+object path searching</a>, including new
+<a href=ch5.dynamic.html#substitution>``Substitution Sequences''</a>.
+</ul>
+<h3>Third draft published May 12, 1999.</h3>
+<ul>
+<li>
+A new symbol type,
+<a href=ch4.symtab.html#stt_common><code>STT_COMMON</code></a>,
+has been added.
+<li>
+Added language restricting the types of objects that may contain
+symbols with the section index
+<a href=ch4.symtab.html#shn_common><code>SHN_COMMON</code></a>.
+<li>
+Dynamic section entries <code>DT_SYMBOLIC</code>,
+<code>DT_TEXTREL</code> and <code>DT_BIND_NOW</code> have
+been moved to level 2.  New <code>DT_FLAGS</code>
+values
+<a href=ch5.dynamic.html#df_symbolic><code>DF_SYMBOLIC</code></a>,
+<a href=ch5.dynamic.html#df_textrel><code>DF_TEXTREL</code></a> and
+<a href=ch5.dynamic.html#df_bind_now><code>DF_BIND_NOW</code></a>
+have been added as replacements.
+<li>
+New rules for interpreting <a href=ch5.dynamic.html#tag_encodings>
+dynamic section tag encodings</a> have been added.
+<li>
+The OS and processor specific ranges for <code>DT_FLAGS</code>
+have been removed.
+<li>
+The language motivating the use of 
+<a href=ch5.dynamic.html#substitution><code>DF_ORIGIN</code></a>
+has been changed.
+</ul>
+<h3>Fourth draft published July 6, 1999.</h3>
+<ul>
+<li>
+New language has been added warning about the use
+of <a href=ch4.symtab.html#weak_note>WEAK symbols</a> in 
+application programs.
+<li>
+New rules have been defined for 
+<a href=ch4.reloc.html#relocation_composition>composition of 
+consecutive relocation entries</a> that reference the same location.
+<li>
+Language has been added clarifying the 
+<a href=ch5.dynamic.html#init_order>order of execution</a> for
+functions specified by initialization and termination arrays.
+</ul>
+<h3>Fifth draft published July 21, 1999.</h3>
+<ul>
+<li>
+New <a href=ch4.sheader.html#init_array>section types</a> 
+and section names added for init arrays,
+fini arrays and pre-init arrays.
+<li>
+An object may now have both 
+<a href=ch5.dynamic.html#dt_init_array>
+<code>DT_INIT</code> and <code>DT_INIT_ARRAY</a> </code> entries
+(and both <code>DT_FINI</code> and <code>DT_FINI_ARRAY</code> entries).
+The relative execution order is specified.
+<li>
+The language describing the 
+<a href=ch5.dynamic.html#fini_order>order of execution for termination
+functions</a> has been revised.
+<li>
+A new <a href=ch5.dynamic.html#preinit>pre-initialization</a>
+mechanism has been added.
+<li>
+It is now up to the processor supplement for each processor
+to specify whether the dynamic linker must invoke
+<a href=ch5.dynamic.html#register_init>the executable file's init and fini routines</a>.
+</ul>
+<h3>Sixth draft published September 14, 1999.</h3>
+<ul>
+<li>
+Changed the numbering of some new <a href=ch4.sheader.html#sh_type>
+section types</a> previously added to account
+for type numbers already in use in particular vendor implementations.
+<li>
+Increased the number of <a href=ch4.sheader.html#sh_flags>
+section flag bits</a> available in the OS specific range.
+</ul>
+<h3>Seventh draft published October 4, 1999.</h3>
+<ul>
+<li>
+Changed the values used for some new 
+<a href=ch4.sheader.html#sh_flags>section attribute flags</a> 
+to accommodate platforms already using previously assigned values.
+<li>
+Added new section attribute flags 
+<a href=ch4.sheader.html#shf_info_link><code>SHF_INFO_LINK</code></a>,
+<a href=ch4.sheader.html#shf_link_order><code>SHF_LINK_ORDER</code></a> and
+<a href=ch4.sheader.html#shf_os_nonconforming><code>SHF_OS_NONCONFORMING</code></a>
+<li>
+Added
+<a href=ch4.sheader.html#linking_rules>rules for linkers</a>
+when linking sections with unrecognized types or flags.
+</ul>
+<h3>Eighth draft published March 30, 2000.</h3>
+<ul>
+<li>
+Added the concept of <a href=ch4.sheader.html#section_groups>section
+groups</a>.
+<li>
+Removed the macros for <code>ELF32_ST_OTHER</code> and 
+<code>ELF64_ST_OTHER</code>.
+</ul>
+<h3>Ninth draft published March 30, 2000.</h3>
+<ul>
+<li>
+Added <a href=ch4.symtab.html#protected_note>language</a> 
+clarifying the semantics of symbols marked as <code>STV_PROTECTED</code>.
+<li>
+Added <a href=ch5.dynamic.html#pointer_note>language</a> 
+clarifying the contents of the initialization and termination arrays.
+</ul>
+<h3>Tenth draft published 22 June 2000.</h3>
+<ul>
+<li>
+Added a <a href=ch4.symtab.html#protected_resolution>sentence</a>
+spelling out the behavior when resolving a symbol to a
+<code>STV_PROTECTED</code> definition from a shared object.
+<li>
+Added support for more than 65,000 sections in the
+<a href=ch4.eheader.html#many_sections>ELF header</a>,
+and with <code>SHT_SYMTAB_SHNDX</code> sections,
+and in <a href=ch4.symtab.html#many_sections>symbol tables</a>.
+</ul>
+<h3>Eleventh draft published 24 April 2001.</h3>
+<ul>
+<li>
+Updated <a href=ch4.eheader.html#e_machine>table</a>
+of <code>EM_*</code> entries.
+<li>
+<a href=ch4.sheader.html#section_group_flags>Added</a>
+<code>GRP_MASKOS</code> and <code>GRP_MASKPROC</code>.
+Changed section group description in a few ways,
+clarifying some fuzzy points and rewriting
+<a href=ch4.sheader.html#section_group_rules>the rules</a>
+for symbols referencing into section groups.
+<li>
+Changed the <a href=ch4.symtab.html#weak_note>warning</a> about using weak
+to be stronger.
+<li>
+<a href=ch4.eheader.html#osabi>Reworded</a>
+the <code>EI_OSABI</code> byte description
+to make is use clearer.
+<li>
+Added the <a href=ch4.eheader.html#generic_osabi_values>table</a>
+of now generic <code>EI_OSABI</code> values.
+<li>
+Added <a href=ch4.sheader.html#shf_tls><code>SHF_TLS</code></a>,
+<a href=ch5.pheader.html#pt_tls><code>PT_TLS</code></a>
+and its <a href=ch5.pheader.html#tls>contents</a>,
+<a href=ch5.dynamic.html#df_static_tls><code>DF_STATIC_TLS</code></a>,
+<a href=ch4.symtab.html#stt_tls><code>STT_TLS</code></a>,
+<a href=ch4.sheader.html#tbss><code>.tbss</code></a>, and
+<a href=ch4.sheader.html#tdata><code>.tdata</code></a>.
+<li>
+Changed
+<a href=ch4.symtab.html#many_sections>the rules</a> for
+<a href=ch4.sheader.html#many_sections><code>SHT_SYMTAB_SHNDX</code></a>
+contents to require <code>0</code> when the corresponding
+<code>st_shndx</code> field is not <code>SHN_XINDEX</code>.
+</ul>
+<hr>
+<a href="contents.html"><img src="contents.gif" alt="Contents"></a>
+<hr>
+<i>
+<small>
+&#169; 1997, 1998, 1999, 2000, 2001 The Santa Cruz Operation, Inc.  All rights reserved.
+</small>
+</i>
+</html>

@@ -1,0 +1,360 @@
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="Author" CONTENT="Joshua Neal">
+   <META NAME="Description" CONTENT="Pure VGA/SVGA hardware programming (registers, identification, and other low-level stuff.)">
+   <META NAME="KeyWords" CONTENT="VGA SVGA hardware video programming">
+   <TITLE>VGA/SVGA Video Programming--Attribute Controller Registers</TITLE>
+</HEAD>
+<BODY>
+
+<CENTER><A HREF="../home.htm">Home</A> <A HREF="vga.htm#register">Back</A>&nbsp;
+<HR WIDTH="100%"><B>Hardware Level VGA and SVGA Video Programming Information
+Page</B></CENTER>
+
+<CENTER>Attribute Controller Registers&nbsp;
+<HR WIDTH="100%"></CENTER>
+
+
+<P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The Attribute Controller
+Registers are accessed via a pair of registers, the Attribute Address/Data
+Register and the Attribute Data Read Register. See the <A HREF="vgareg.htm">Accessing
+the VGA Registers</A> section for more detals. The Address/Data Register
+is located at port 3C0h and the Data Read Register is located at port 3C1h.
+<BR>&nbsp;
+<TABLE BORDER WIDTH="600" CELLPADING="2" >
+<CAPTION><A NAME="3C0"></A><B>Attribute Address Register(3C0h)</B></CAPTION>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75">7</TD>
+
+<TD WIDTH="75">6</TD>
+
+<TD WIDTH="75">5</TD>
+
+<TD WIDTH="75">4</TD>
+
+<TD WIDTH="75">3</TD>
+
+<TD WIDTH="75">2</TD>
+
+<TD WIDTH="75">1</TD>
+
+<TD WIDTH="75">0</TD>
+</TR>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75">PAS</TD>
+
+<TD COLSPAN="5" WIDTH="375">Attribute Address</TD>
+</TR>
+</TABLE>
+&nbsp;
+<UL><B>PAS -- Palette Address Source<BR>
+</B>"<I>This bit is set to 0 to load color values to the registers in the
+internal palette. It is set to 1 for normal operation of the attribute
+controller. Note: Do not access the internal palette while this bit is
+set to 1. While this bit is 1, the Type 1 video subsystem disables accesses
+to the palette; however, the Type 2 does not, and the actual color value
+addressed cannot be ensured.</I>"
+<LI>
+<B>Attribute Address<BR>
+</B>This field specifies the index value of the attribute register to be
+read or written.</LI>
+</UL>
+&nbsp;
+<TABLE BORDER WIDTH="600" CELLPADING="2" >
+<CAPTION ALIGN=TOP><A NAME="000F"></A><B>Palette Registers (Index 00-0Fh)</B></CAPTION>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75">7</TD>
+
+<TD WIDTH="75">6</TD>
+
+<TD WIDTH="75">5</TD>
+
+<TD WIDTH="75">4</TD>
+
+<TD WIDTH="75">3</TD>
+
+<TD WIDTH="75">2</TD>
+
+<TD WIDTH="75">1</TD>
+
+<TD WIDTH="75">0</TD>
+</TR>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD COLSPAN="6" WIDTH="450">Internal Palette Index</TD>
+</TR>
+</TABLE>
+&nbsp;
+<UL><B>Internal Palette Index<BR>
+</B>"<I>These 6-bit registers allow a dynamic mapping between the text
+attribute or graphic color input value and the display color on the CRT
+screen. When set to 1, this bit selects the appropriate color. The Internal
+Palette registers should be modified only during the vertical retrace interval
+to avoid problems with the displayed image. These internal palette values
+are sent off-chip to the video DAC, where they serve as addresses into
+the DAC registers.</I>"</UL>
+&nbsp;
+<TABLE BORDER WIDTH="600" CELLPADING="2" >
+<CAPTION ALIGN=TOP><A NAME="10"></A><B>Attribute Mode Control Register
+(Index 10h)</B></CAPTION>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75">7</TD>
+
+<TD WIDTH="75">6</TD>
+
+<TD WIDTH="75">5</TD>
+
+<TD WIDTH="75">4</TD>
+
+<TD WIDTH="75">3</TD>
+
+<TD WIDTH="75">2</TD>
+
+<TD WIDTH="75">1</TD>
+
+<TD WIDTH="75">0</TD>
+</TR>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75">P54S</TD>
+
+<TD WIDTH="75">8BIT</TD>
+
+<TD WIDTH="75">PPM</TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75">BLINK</TD>
+
+<TD WIDTH="75">LGE</TD>
+
+<TD WIDTH="75">MONO</TD>
+
+<TD WIDTH="75">ATGE</TD>
+</TR>
+</TABLE>
+&nbsp;
+<UL><B>P54S -- Palette Bits 5-4 Select<BR>
+</B>"<I>This bit selects the source for the P5 and P4 video bits that act
+as inputs to the video DAC. When this bit is set to 0, P5 and P4 are the
+outputs of the Internal Palette registers. When this bit is set to 1, P5
+and P4 are bits 1 and 0 of the Color Select register.</I>"
+<BR><B>8BIT -- 8-bit Color Enable<BR>
+</B>"<I>When this bit is set to 1, the video data is sampled so that eight
+bits are available to select a color in the 256-color mode (0x13). This
+bit is set to 0 in all other modes.</I>"
+<LI>
+<B>PPM -- Pixel Panning Mode</B></LI>
+
+<BR>This field allows the upper half of the screen to pan independently
+of the lower screen. If this field is set to 0 then nothing special occurs
+during a successful line compare (see the <A HREF="crtcreg.htm#18">Line
+Compare</A> field.) If this field is set to 1, then upon a successful line
+compare, the bottom portion of the screen is displayed as if the <A HREF="attrreg.htm#13">Pixel
+Shift Count</A> and <A HREF="crtcreg.htm#08">Byte Panning</A> fields are
+set to 0.
+<BR><B>BLINK - Blink Enable<BR>
+</B>"<I>When this bit is set to 0, the most-significant bit of the attribute
+selects the background intensity (allows 16 colors for background). When
+set to 1, this bit enables blinking.</I>"
+<LI>
+<B>LGA - Line Graphics Enable</B></LI>
+
+<BR>This field is used in 9 bit wide character modes to provide continuity
+for the horizontal line characters in the range C0h-DFh. If this field
+is set to 0, then the 9th column of these characters is replicated from
+the 8th column of the character. Otherwise, if it is set to 1 then the
+9th column is set to the background like the rest of the characters.
+<LI>
+<B>MONO - Monochrome Emulation</B></LI>
+
+<BR>This field is used to store your favorite bit. According to IBM, "When
+this bit is set to 1, monochrome emulation mode is selected. When this
+bit is set to 0, color |emulation mode is selected." It is present and
+programmable in all of the hardware but it apparently does nothing. The
+internal palette is used to provide monochrome emulation instead.
+<LI>
+<B>ATGE - Attribute Controller Graphics Enable<BR>
+</B>"<I>When set to 1, this bit selects the graphics mode of operation.</I>"</LI>
+</UL>
+&nbsp;
+<TABLE BORDER WIDTH="600" CELLPADING="2" >
+<CAPTION><A NAME="11"></A><B>Overscan Color Register (Index 11h)</B></CAPTION>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75">7</TD>
+
+<TD WIDTH="75">6</TD>
+
+<TD WIDTH="75">5</TD>
+
+<TD WIDTH="75">4</TD>
+
+<TD WIDTH="75">3</TD>
+
+<TD WIDTH="75">2</TD>
+
+<TD WIDTH="75">1</TD>
+
+<TD WIDTH="75">0</TD>
+</TR>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD COLSPAN="8" WIDTH="600">Overscan Palette Index</TD>
+</TR>
+</TABLE>
+&nbsp;
+<UL><B>Overscan Palette Index<BR>
+</B>"<I>These bits select the border color used in the 80-column alphanumeric
+modes and in the graphics modes other than modes 4, 5, and D. (Selects
+a color from one of the DAC registers.)</I>"</UL>
+&nbsp;
+<TABLE BORDER WIDTH="600" CELLPADING="2" >
+<CAPTION ALIGN=TOP><A NAME="12"></A><B>Color Plane Enable Register (Index
+12h)</B></CAPTION>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75">7</TD>
+
+<TD WIDTH="75">6</TD>
+
+<TD WIDTH="75">5</TD>
+
+<TD WIDTH="75">4</TD>
+
+<TD WIDTH="75">3</TD>
+
+<TD WIDTH="75">2</TD>
+
+<TD WIDTH="75">1</TD>
+
+<TD WIDTH="75">0</TD>
+</TR>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD COLSPAN="4" WIDTH="300">Color Plane Enable</TD>
+</TR>
+</TABLE>
+&nbsp;
+<UL>
+<LI>
+<B>Color Plane Enable<BR>
+</B>"<I>Setting a bit to 1, enables the corresponding display-memory color
+plane.</I>"</LI>
+</UL>
+&nbsp;
+<TABLE BORDER WIDTH="600" CELLPADING="2" >
+<CAPTION ALIGN=TOP><A NAME="13"></A><B>Horizontal Pixel Panning Register
+(Index 13h)</B></CAPTION>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75">7</TD>
+
+<TD WIDTH="75">6</TD>
+
+<TD WIDTH="75">5</TD>
+
+<TD WIDTH="75">4</TD>
+
+<TD WIDTH="75">3</TD>
+
+<TD WIDTH="75">2</TD>
+
+<TD WIDTH="75">1</TD>
+
+<TD WIDTH="75">0</TD>
+</TR>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD COLSPAN="4" WIDTH="300">Pixel Shift Count</TD>
+</TR>
+</TABLE>
+&nbsp;
+<UL><B>Pixel Shift Count<BR>
+</B>"<I>These bits select the number of pels that the video data is shifted
+to the left. PEL panning is available in both alphanumeric and graphics
+modes.</I>"</UL>
+&nbsp;
+<TABLE BORDER WIDTH="600" CELLPADING="2" >
+<CAPTION ALIGN=TOP><A NAME="14"></A><B>Color Select Register (Index 14h)</B></CAPTION>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75">7</TD>
+
+<TD WIDTH="75">6</TD>
+
+<TD WIDTH="75">5</TD>
+
+<TD WIDTH="75">4</TD>
+
+<TD WIDTH="75">3</TD>
+
+<TD WIDTH="75">2</TD>
+
+<TD WIDTH="75">1</TD>
+
+<TD WIDTH="75">0</TD>
+</TR>
+
+<TR ALIGN=CENTER VALIGN=CENTER>
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD WIDTH="75"></TD>
+
+<TD COLSPAN="2" WIDTH="150">Color Select 7-6</TD>
+
+<TD COLSPAN="2" WIDTH="150">Color Select 5-4</TD>
+</TR>
+</TABLE>
+&nbsp;
+<UL><B>Color Select 7-6<BR>
+</B>"<I>In modes other than mode 13 hex, these are the two most-significant
+bits of the 8-bit digital color value to the video DAC. In mode 13 hex,
+the 8-bit attribute is the digital color value to the video DAC. These
+bits are used to rapidly switch between sets of colors in the video DAC.</I>"
+<BR><B>Color Select 5-4<BR>
+</B>"<I>These bits can be used in place of the P4 and P5 bits from the
+Internal Palette registers to form the&nbsp; 8-bit digital color value
+to the video DAC. Selecting these bits is done in the Attribute Mode Control&nbsp;
+register (index 0x10). These bits are used to rapidly switch between colors
+sets within the video DAC.</I>"</UL>
+Notice: All trademarks used or referred to on this page are the property
+of their respective owners.
+<BR>All pages are Copyright &copy; 1997, 1998, J. D. Neal, except where
+noted. Permission for utilization and distribution is subject to the terms
+of the <A HREF="license.htm">FreeVGA Project Copyright License</A>.
+</BODY>
+</HTML>

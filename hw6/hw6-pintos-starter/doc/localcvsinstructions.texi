@@ -1,0 +1,172 @@
+@c
+@c Instructions on how to set up a group environment, permissions, 
+@c CVS repository, dealing with local locking issues etc.
+@c
+@c While some of the discussion may apply to more than one environment,
+@c no attempt was made to untangle and split the discussion.
+@c
+
+@menu
+* Setting Up CVS::              
+* Using CVS::                   
+* CVS Locking::                 
+@end menu
+
+@node Setting Up CVS
+@subsection Setting Up CVS
+
+To set up CVS for use with Pintos on the Leland machines, start by
+choosing one group member as the keeper of the CVS repository.
+Everyone in the group will be able to use the CVS repository, but the
+keeper will actually create the repository, keep its files in his or
+her home directory, and maintain permissions for its contents.
+
+The keeper has to perform several steps to set up the repository.
+First, create a new AFS group for the repository by executing
+@samp{pts creategroup @var{keeper}:pintos-cvs}, where @var{keeper} is
+the keeper's Leland username.  Then, add each group member to the new
+group by repeatedly using the command @samp{pts adduser -user
+@var{username} -group @var{keeper}:pintos-cvs}, where @var{username}
+is the name of a group member.  After the group is created and its
+members added, @samp{pts membership @var{keeper}:pintos-cvs} should
+report that each group member is a member of the
+@samp{@var{keeper}:pintos-cvs} group.
+
+The keeper now creates the repository directory and gives the group
+members access to it.  We will assume that the repository will be in a
+directory called @file{cvs} in the keeper's home directory.  First
+create this directory with @samp{mkdir $HOME/cvs}, then give group
+members access to it with @samp{fs setacl -dir $HOME/cvs -acl
+@var{keeper}:pintos-cvs write}.  Group members also need to be able to
+look up the @file{cvs} directory in the keeper's home directory, which
+can be enabled via @samp{fs setacl -dir $HOME -acl
+@var{keeper}:pintos-cvs l} (that's letter ``ell,'' not digit
+``one.'').@footnote{This command will allow group members to list the
+files in your home directory, but not read or write them.  It should not
+create a security risk unless the names of files in your home directory
+are secret.}
+
+Now initialize the repository.
+To initialize the repository, execute @samp{cvs -d $HOME/cvs init}.
+
+Finally, import the Pintos sources into the newly initialized
+repository.  If you have an existing set of Pintos sources you want to
+add to the repository, @samp{cd} to its @samp{pintos} directory now.
+Otherwise, to import the base Pintos source tree, @samp{cd} to
+@file{/usr/class/cs140/pintos/pintos} (note the doubled
+@samp{pintos}).  After changing the current directory, execute this
+command:
+@example
+cvs -d $HOME/cvs import -m "Imported sources" pintos foobar start
+@end example
+
+Here is a summary of the commands you have now executed:
+
+@example
+pts creategroup @var{keeper}:pintos-cvs
+pts adduser -user @var{username} -group @var{keeper}:pintos-cvs
+mkdir $HOME/cvs
+fs setacl -dir $HOME/cvs -acl @var{keeper}:pintos-cvs write
+fs setacl -dir $HOME -acl @var{keeper}:pintos-cvs l
+cvs -d $HOME/cvs init
+cd /usr/class/cs140/pintos/pintos
+cvs -d $HOME/cvs import -m "Imported sources" pintos foobar start
+@end example
+
+The repository is now ready for use by any group member, as described
+below.  Keep in mind that the repository should only be accessed
+using CVS commands---it is not generally useful to examine them by
+hand, and you should definitely not modify them yourself.
+
+@node Using CVS
+@subsection Using CVS
+
+To use CVS, start by check out a working copy of the contents of the
+CVS repository into a directory named @file{@var{dir}}.  To do so, execute
+@samp{cvs -d ~@var{keeper}/cvs checkout -d @var{dir} pintos}, where
+@var{keeper} is the CVS keeper's Leland username.
+
+(If this fails due to some kind of permission problem, then run
+@command{aklog} and try again.  If it still doesn't work, log out and
+back in.  If that still doesn't fix the problem, the CVS repository may
+not be initialized properly.)
+
+At this point, you can modify any of the files in the working copy.
+You can see the changes you've made with @samp{cvs diff -u}.  If you
+want to commit these changes back to the repository, making them
+visible to the other group members, you can use the CVS commit
+command.  Within the @file{pintos} directory, execute @samp{cvs
+commit}.  This will figure out the files that have been changed and
+fire up a text editor for you to describe the changes.  By default,
+this editor is @file{vi}, but you can select a different editor by
+setting the @env{CVSEDITOR} environment variable, e.g.@: with
+@samp{setenv CVSEDITOR emacs} (add this line to your @file{.cvsrc} to
+make it permanent).
+
+Suppose another group member has committed changes.  You can see the
+changes committed to the repository since the time you checked it out
+(or updated from it) with @samp{cvs diff -u -r BASE -r HEAD}.  You can
+merge those change into your working copy using @samp{cvs update}.  If
+any of your local changes conflict with the committed changes, the CVS
+command output should tell you.  In that case, edit the files that
+contain conflicts, looking for @samp{<<<} and @samp{>>>} that denote
+the conflicts, and fix the problem.
+
+You can view the history of @var{file} in your working directory,
+including the log messages, with @samp{cvs log @var{file}}.
+
+You can give a particular set of file versions a name called a
+@dfn{tag}.  First @samp{cd} to the root of the working copy, then
+execute @samp{cvs tag @var{name}}.  It's best to have no local changes
+in the working copy when you do this, because the tag will not include
+uncommitted changes.  To recover the tagged repository later, use the
+@samp{checkout} command in the form @samp{cvs -d ~@var{keeper}/cvs
+checkout -r @var{tag} -d @var{dir} pintos}, where @var{keeper} is the
+username of the CVS keeper and @var{dir} is the directory to put the
+tagged repository into.
+
+If you add a new file to the source tree, you'll need to add it to the
+repository with @samp{cvs add @var{file}}.  This command does not have
+lasting effect until the file is committed later with @samp{cvs
+commit}.
+
+To remove a file from the source tree, first remove it from the file
+system with @command{rm}, then tell CVS with @samp{cvs remove
+@var{file}}.  Again, only @samp{cvs commit} will make the change
+permanent.
+
+To discard your local changes for a given file, without committing
+them, use @samp{cvs update -C @var{file}}.
+
+To check out a version of your repository as of a particular date, use
+the command @samp{cvs -d ~@var{keeper}/cvs checkout -D '@var{date}' -d
+@var{dir} pintos}, where @var{keeper} is the username of the CVS
+keeper and @var{dir} is the directory to put the tagged repository
+into..  A typical format for @var{date} is @samp{YYYY-MM-DD HH:MM},
+but CVS accepts several formats, even something like @samp{1 hour
+ago}.
+
+For more information, visit the @uref{https://www.cvshome.org/, , CVS
+home page}.
+
+@node CVS Locking
+@subsection CVS Locking
+
+You might occasionally see a message like this while using CVS:
+
+@example
+waiting for blp's lock in /afs/ir/users/b/l/blp/cvs
+@end example
+
+This normally means that more than one user is accessing the repository
+at the same time.  CVS should automatically retry after 30 seconds, at
+which time the operation should normally be able to continue.
+
+If you encounter a long wait for a lock, of more than a minute or so, it
+may indicate that a CVS command did not complete properly and failed to
+remove its locks.  If you think that this is the case, ask the user in
+question about it.  If it appears that an operation did go awry, then
+you (or the named user) can delete files whose names start with
+@file{#cvs.rfl}, @file{#cvs.wfl}, or @file{#cvs.lock} in the directory
+mentioned in the message.  Doing so should allow your operation to
+proceed.  Do not delete or modify other files.

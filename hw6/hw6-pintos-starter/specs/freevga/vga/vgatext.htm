@@ -1,0 +1,185 @@
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="Author" CONTENT="Joshua Neal">
+   <META NAME="Description" CONTENT="Pure VGA/SVGA hardware programming (registers, identification, and other low-level stuff.)">
+   <META NAME="KeyWords" CONTENT="VGA SVGA hardware video programming">
+   <TITLE>VGA/SVGA Video Programming--VGA Text Mode Operation</TITLE>
+</HEAD>
+<BODY>
+
+<CENTER><A HREF="../home.htm">Home</A> <A HREF="#intro">Intro</A> <A HREF="#memory">Memory</A>
+<A HREF="#attributes">Attributes</A> <A HREF="#fonts">Fonts</A> <A HREF="#cursor">Cursor</A>
+<A HREF="vga.htm#general">Back</A>&nbsp;
+<HR WIDTH="100%"><B>Hardware Level VGA and SVGA Video Programming Information
+Page</B></CENTER>
+
+<CENTER>VGA Text Mode Operation&nbsp;
+<HR WIDTH="100%"></CENTER>
+
+<UL>
+<LI>
+<A HREF="#intro">Introduction</A> -- gives scope of this page.</LI>
+
+<LI>
+<A HREF="#memory">Display Memory Organization</A> -- details how the VGA's
+planes are utilized when in text mode.</LI>
+
+<LI>
+<A HREF="#attributes">Attributes</A> -- details the fields of the attribute
+byte.</LI>
+
+<LI>
+<A HREF="#fonts">Fonts</A> -- details the operation of the character generation
+hardware.</LI>
+
+<LI>
+<A HREF="#cursor">Cursor</A> -- details on manipulating the text-mode cursor.</LI>
+</UL>
+<A NAME="intro"></A><B>Introduction</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This section is intended
+to document the VGA's operation when it is in the text modes, including
+attributes and fonts. While it would seem that the text modes are adequately
+supported by the VGA BIOS, there is actually much that can be done with
+the VGA text modes that can only be accomplished by going directly to the
+hardware. Furthermore, I have found no good reference on the VGA text modes;
+most VGA references take them for granted without delving into their operation.
+
+<P><A NAME="memory"></A><B>Display Memory Organization</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The four display memory
+planes are used for different purposes when the VGA is in text mode. Each
+byte in plane 0 is used to store an index into the character font map.
+The corresponding byte in plane 1 is used to specify the attributes of
+the character possibly including color, font select, blink, underline and
+reverse. For more details on attribute operation see the Attributes section
+below. Display plane 2 is used to store the bitmaps for the characters
+themselves. This is discussed in the Fonts section below. Normally, the
+odd/even read and write addressing mode is used to make planes 0 and 1
+accessible at interleaved host memory addresses.
+
+<P><A NAME="attributes"></A><B>Attributes</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The attribute byte is divided
+into two four bit fields. The field from 7-4 is used as an index into the
+palette registers for the background color which used when a font bit is
+0. The field from 3-0 is used as an index into the palette registers for
+the foreground which is used when a font bit is 1. Also the attribute can
+control several other aspects which may modify the way the character is
+displayed.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If the <A HREF="attrreg.htm#10">Blink
+Enable</A> field is set to 1, character blinking is enabled. When blinking
+is enabled, bit 3 of the background color is forced to 0 for attribute
+generation purposes, and if bit 7 of the attribute byte for a character
+is set to 1, the foreground color alternates between the foreground and
+background, causing the character to blink. The blink rate is determined
+by the vertical sync rate divided by 32.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If the bits 2-0 of the attribute
+byte is equal to 001b and bits 6-4 of the attribute byte is equal to 000b,
+then the line of the character specified by the <A HREF="crtcreg.htm#14">Underline
+Location</A> field is replaced with the foreground color. Note if the line
+specified by the <A HREF="crtcreg.htm#14">Underline Location</A> field
+is not normally displayed because it is greater than the maximum scan line
+of the characters displayed, then the underline capability is effectively
+disabled.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bit 3 of the attribute byte,
+as well as selecting the foreground color for its corresponding character,
+also is used to select between the two possible character sets (see <A HREF="#fonts">Fonts</A>
+below.) If both character sets are the same, then the bit effectively functions
+only to select the foreground color.
+
+<P><A NAME="fonts"></A><B>Fonts</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The VGA's text-mode hardware
+provides for a very fast text mode. While this mode is not used as often
+these days, it used to be the predominant mode of operation for applications.
+The reason that the text mode was fast, much faster than a graphics mode
+at the same resolution was that in text mode, the screen is partitioned
+into characters. A single character/attribute pair is written to screen,
+and the hardware uses a font table in video memory to map those character
+and attribute pairs into video output, as opposed to having to write all
+of the bits in a character, which could take over 16 operations to write
+to screen. As CPU display memory bandwidth is somewhat limited (particularly
+on on older cards), this made text mode the mode of choice for applications
+which did not require graphics.
+
+<P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For each character
+position, bit 3 of the attribute byte selects which character set is used,
+and the character byte selects which of the 256 characters in that font
+are used. Up to eight sets of font bitmaps can be stored simultaneously
+in display memory plane 2. The VGA's hardware provides for two banks of
+256 character bitmaps to displayed simultaneously. Two fields, <A HREF="seqreg.htm#03">Character
+Set A Select</A> and <A HREF="seqreg.htm#03">Character Set B Select</A>
+field are used to determine which of the eight font bitmaps are currently
+displayed. If bit 3 of a character's attribute byte is set to 1, then the
+character set selected by <A HREF="seqreg.htm#03">Character Set A Select</A>
+field, otherwise the character set specified by <A HREF="seqreg.htm#03">Character
+Set B Select</A> field is used. Ordinarily, both character sets use the
+same map in memory, as utilizing 2 different character sets causes character
+set A to be limited to colors 0-7, and character set B to be limited to
+colors 8-15.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fonts are either 8 or 9
+pixels wide and can be from 1 to 32 pixels high. The width is determined
+by the <A HREF="seqreg.htm#01">9/8 Dot Mode</A> field. Characters normally
+have a line of blank pixels to the right and bottom of the character to
+separate the character from its neighbor. Normally this is included in
+the character's bitmap, leaving only 7 bit columns for the character. Characters
+such as the capital M have to be squished to fit this, and would look better
+if all 8 pixels in the bitmap could be used, as in 9 Dot mode where the
+characters have an extra ninth bit in width, which is displayed in the
+text background color, However, this causes the line drawing characters
+to be discontinuous due to the blank column. Fortunately, the <A HREF="attrreg.htm#10">Line
+Graphics Enable</A> field can be set to allow character codes C0h-DFh to
+have their ninth column be identical to their eighth column, providing
+for continuity between line drawing characters. The height is determined
+by the <A HREF="crtcreg.htm#09">Maximum Scan Line</A> field which is set
+to one less than the number of scan lines in the character.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Display memory plane 2 is
+divided up into eight 8K banks of characters, each of which holds 256 character
+bitmaps. Each character is on a 32 byte boundary and is 32 bytes long.
+The offset in plane 2 of a character within a bank is determined by taking
+the character's value and multiplying it by 32. The first byte at this
+offset contains the 8 pixels of the top scan line of the characters. Each
+successive byte contains another scan line's worth of pixels. The best
+way to read and write fonts to display memory, assuming familiarity with
+the information from the <A HREF="vgamem.htm">Accessing the Display Memory</A>
+page, is to use standard (not Odd/Even) addressing and Read Mode 0 and
+Write Mode 0 with plane 2 selected for read or write.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The following example shows
+three possible bitmap representations of text characters. In the left example
+an 8x8 character box is used. In this case, the <A HREF="crtcreg.htm#09">Maximum
+Scan Line</A> field is programmed to 7 and the <A HREF="seqreg.htm#01">9/8
+Dot Mode</A> field is programmed to 0. Note that the bottom row and right-most
+column is blank. This is used to provide inter-character spacing. The middle
+example shows an 8x16 character. In this case the <A HREF="crtcreg.htm#09">Maximum
+Scan Line</A> field is programmed to 15 and the <A HREF="seqreg.htm#01">9/8
+Dot Mode</A> field is programmed to 0. Note that the character has extra
+space at the bottom below the baseline of the character. This is used by
+characters with parts descending below the baseline, such as the lowercase
+letter "g". The right example shows a 9x16 character. In this case the
+<A HREF="crtcreg.htm#09">Maximum Scan Line</A> field is programmed to 15
+and the <A HREF="seqreg.htm#01">9/8 Dot Mode</A> field is programmed to
+1. Note that the rightmost column is used by the character, as the ninth
+column for 9-bit wide characters is assumed blank (excepting for the behavior
+of the the <A HREF="attrreg.htm#10">Line Graphics Enable</A> field.) allowing
+all eight bits of width to be used to specify the character, instead of
+having to devote an entire column for inter-character spacing.
+<CENTER><A HREF="char.txt"><IMG SRC="Char.gif" ALT="Click for Textified Examples of Text Mode Bitmap Characters" BORDER=0 HEIGHT=256 WIDTH=376></A></CENTER>
+&nbsp;
+
+<P>&nbsp;
+<BR><A NAME="cursor"></A><B>Cursor</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The VGA has the hardware capability
+to display a cursor in the text modes. Further details on the text-mode
+cursor's operation can be found in the following section:
+<UL>
+<LI>
+<A HREF="textcur.htm">Manipulating the Text-mode Cursor</A> -- details
+controlling the appearance and location of the cursor.</LI>
+</UL>
+Notice: All trademarks used or referred to on this page are the property
+of their respective owners.
+<BR>All pages are Copyright &copy; 1997, 1998, J. D. Neal, except where
+noted. Permission for utilization and distribution is subject to the terms
+of the <A HREF="license.htm">FreeVGA Project Copyright License</A>.
+<BR>&nbsp;
+<BR>&nbsp;
+</BODY>
+</HTML>
