@@ -1,0 +1,781 @@
+@node Debugging Tools
+@appendix Debugging Tools
+
+Many tools lie at your disposal for debugging Pintos.  This appendix
+introduces you to a few of them.
+
+@menu
+* printf::                      
+* ASSERT::                      
+* Function and Parameter Attributes::  
+* Backtraces::                  
+* GDB::                         
+* Triple Faults::               
+* Modifying Bochs::             
+* Debugging Tips::              
+@end menu
+
+@node printf
+@section @code{printf()}
+
+Don't underestimate the value of @func{printf}.  The way
+@func{printf} is implemented in Pintos, you can call it from
+practically anywhere in the kernel, whether it's in a kernel thread or
+an interrupt handler, almost regardless of what locks are held.
+
+@func{printf} is useful for more than just examining data.
+It can also help figure out when and where something goes wrong, even
+when the kernel crashes or panics without a useful error message.  The
+strategy is to sprinkle calls to @func{printf} with different strings
+(e.g.@: @code{"<1>"}, @code{"<2>"}, @dots{}) throughout the pieces of
+code you suspect are failing.  If you don't even see @code{<1>} printed,
+then something bad happened before that point, if you see @code{<1>}
+but not @code{<2>}, then something bad happened between those two
+points, and so on.  Based on what you learn, you can then insert more
+@func{printf} calls in the new, smaller region of code you suspect.
+Eventually you can narrow the problem down to a single statement.
+@xref{Triple Faults}, for a related technique.
+
+@node ASSERT
+@section @code{ASSERT}
+
+Assertions are useful because they can catch problems early, before
+they'd otherwise be noticed.  Ideally, each function should begin with a
+set of assertions that check its arguments for validity.  (Initializers
+for functions' local variables are evaluated before assertions are
+checked, so be careful not to assume that an argument is valid in an
+initializer.)  You can also sprinkle assertions throughout the body of
+functions in places where you suspect things are likely to go wrong.
+They are especially useful for checking loop invariants.
+
+Pintos provides the @code{ASSERT} macro, defined in @file{<debug.h>},
+for checking assertions.
+
+@defmac ASSERT (expression)
+Tests the value of @var{expression}.  If it evaluates to zero (false),
+the kernel panics.  The panic message includes the expression that
+failed, its file and line number, and a backtrace, which should help you
+to find the problem.  @xref{Backtraces}, for more information.
+@end defmac
+
+@node Function and Parameter Attributes
+@section Function and Parameter Attributes
+
+These macros defined in @file{<debug.h>} tell the compiler special
+attributes of a function or function parameter.  Their expansions are
+GCC-specific.
+
+@defmac UNUSED
+Appended to a function parameter to tell the compiler that the
+parameter might not be used within the function.  It suppresses the
+warning that would otherwise appear.
+@end defmac
+
+@defmac NO_RETURN
+Appended to a function prototype to tell the compiler that the
+function never returns.  It allows the compiler to fine-tune its
+warnings and its code generation.
+@end defmac
+
+@defmac NO_INLINE
+Appended to a function prototype to tell the compiler to never emit
+the function in-line.  Occasionally useful to improve the quality of
+backtraces (see below).
+@end defmac
+
+@defmac PRINTF_FORMAT (@var{format}, @var{first})
+Appended to a function prototype to tell the compiler that the function
+takes a @func{printf}-like format string as the argument numbered
+@var{format} (starting from 1) and that the corresponding value
+arguments start at the argument numbered @var{first}.  This lets the
+compiler tell you if you pass the wrong argument types.
+@end defmac
+
+@node Backtraces
+@section Backtraces
+
+When the kernel panics, it prints a ``backtrace,'' that is, a summary
+of how your program got where it is, as a list of addresses inside the
+functions that were running at the time of the panic.  You can also
+insert a call to @func{debug_backtrace}, prototyped in
+@file{<debug.h>}, to print a backtrace at any point in your code.
+@func{debug_backtrace_all}, also declared in @file{<debug.h>}, 
+prints backtraces of all threads.
+
+The addresses in a backtrace are listed as raw hexadecimal numbers,
+which are difficult to interpret.  We provide a tool called
+@command{backtrace} to translate these into function names and source
+file line numbers.
+Give it the name of your @file{kernel.o} as the first argument and the
+hexadecimal numbers composing the backtrace (including the @samp{0x}
+prefixes) as the remaining arguments.  It outputs the function name
+and source file line numbers that correspond to each address.  
+
+If the translated form of a backtrace is garbled, or doesn't make
+sense (e.g.@: function A is listed above function B, but B doesn't
+call A), then it's a good sign that you're corrupting a kernel
+thread's stack, because the backtrace is extracted from the stack.
+Alternatively, it could be that the @file{kernel.o} you passed to
+@command{backtrace} is not the same kernel that produced
+the backtrace.
+
+Sometimes backtraces can be confusing without any corruption.
+Compiler optimizations can cause surprising behavior.  When a function
+has called another function as its final action (a @dfn{tail call}), the
+calling function may not appear in a backtrace at all.  Similarly, when
+function A calls another function B that never returns, the compiler may
+optimize such that an unrelated function C appears in the backtrace
+instead of A.  Function C is simply the function that happens to be in
+memory just after A.  In the threads project, this is commonly seen in
+backtraces for test failures; see @ref{The pass function fails, ,
+@func{pass} Fails}, for more information.
+
+@menu
+* Backtrace Example::           
+@end menu
+
+@node Backtrace Example
+@subsection Example
+
+Here's an example.  Suppose that Pintos printed out this following call
+stack, which is taken from an actual Pintos submission for the file
+system project:
+
+@example
+Call stack: 0xc0106eff 0xc01102fb 0xc010dc22 0xc010cf67 0xc0102319
+0xc010325a 0x804812c 0x8048a96 0x8048ac8.
+@end example
+
+You would then invoke the @command{backtrace} utility like shown below,
+cutting and pasting the backtrace information into the command line.
+This assumes that @file{kernel.o} is in the current directory.  You
+would of course enter all of the following on a single shell command
+line, even though that would overflow our margins here:
+
+@example
+backtrace kernel.o 0xc0106eff 0xc01102fb 0xc010dc22 0xc010cf67 
+0xc0102319 0xc010325a 0x804812c 0x8048a96 0x8048ac8
+@end example
+
+The backtrace output would then look something like this:
+
+@example
+0xc0106eff: debug_panic (lib/debug.c:86)
+0xc01102fb: file_seek (filesys/file.c:405)
+0xc010dc22: seek (userprog/syscall.c:744)
+0xc010cf67: syscall_handler (userprog/syscall.c:444)
+0xc0102319: intr_handler (threads/interrupt.c:334)
+0xc010325a: intr_entry (threads/intr-stubs.S:38)
+0x0804812c: (unknown)
+0x08048a96: (unknown)
+0x08048ac8: (unknown)
+@end example
+
+(You will probably not see exactly the same addresses if you run the
+command above on your own kernel binary, because the source code you
+compiled and the compiler you used are probably different.)
+
+The first line in the backtrace refers to @func{debug_panic}, the
+function that implements kernel panics.  Because backtraces commonly
+result from kernel panics, @func{debug_panic} will often be the first
+function shown in a backtrace.
+
+The second line shows @func{file_seek} as the function that panicked,
+in this case as the result of an assertion failure.  In the source code
+tree used for this example, line 405 of @file{filesys/file.c} is the
+assertion
+
+@example
+ASSERT (file_ofs >= 0);
+@end example
+
+@noindent
+(This line was also cited in the assertion failure message.)
+Thus, @func{file_seek} panicked because it passed a negative file offset
+argument.
+
+The third line indicates that @func{seek} called @func{file_seek},
+presumably without validating the offset argument.  In this submission,
+@func{seek} implements the @code{seek} system call.
+
+The fourth line shows that @func{syscall_handler}, the system call
+handler, invoked @func{seek}.
+
+The fifth and sixth lines are the interrupt handler entry path.
+
+The remaining lines are for addresses below @code{PHYS_BASE}.  This
+means that they refer to addresses in the user program, not in the
+kernel.  If you know what user program was running when the kernel
+panicked, you can re-run @command{backtrace} on the user program, like
+so: (typing the command on a single line, of course):
+
+@example
+backtrace tests/filesys/extended/grow-too-big 0xc0106eff 0xc01102fb
+0xc010dc22 0xc010cf67 0xc0102319 0xc010325a 0x804812c 0x8048a96
+0x8048ac8
+@end example
+
+The results look like this:
+
+@example
+0xc0106eff: (unknown)
+0xc01102fb: (unknown)
+0xc010dc22: (unknown)
+0xc010cf67: (unknown)
+0xc0102319: (unknown)
+0xc010325a: (unknown)
+0x0804812c: test_main (...xtended/grow-too-big.c:20)
+0x08048a96: main (tests/main.c:10)
+0x08048ac8: _start (lib/user/entry.c:9)
+@end example
+
+You can even specify both the kernel and the user program names on
+the command line, like so:
+
+@example
+backtrace kernel.o tests/filesys/extended/grow-too-big 0xc0106eff
+0xc01102fb 0xc010dc22 0xc010cf67 0xc0102319 0xc010325a 0x804812c
+0x8048a96 0x8048ac8
+@end example
+
+The result is a combined backtrace:
+
+@example
+In kernel.o:
+0xc0106eff: debug_panic (lib/debug.c:86)
+0xc01102fb: file_seek (filesys/file.c:405)
+0xc010dc22: seek (userprog/syscall.c:744)
+0xc010cf67: syscall_handler (userprog/syscall.c:444)
+0xc0102319: intr_handler (threads/interrupt.c:334)
+0xc010325a: intr_entry (threads/intr-stubs.S:38)
+In tests/filesys/extended/grow-too-big:
+0x0804812c: test_main (...xtended/grow-too-big.c:20)
+0x08048a96: main (tests/main.c:10)
+0x08048ac8: _start (lib/user/entry.c:9)
+@end example
+
+Here's an extra tip for anyone who read this far: @command{backtrace}
+is smart enough to strip the @code{Call stack:} header and @samp{.}
+trailer from the command line if you include them.  This can save you
+a little bit of trouble in cutting and pasting.  Thus, the following
+command prints the same output as the first one we used:
+
+@example
+backtrace kernel.o Call stack: 0xc0106eff 0xc01102fb 0xc010dc22
+0xc010cf67 0xc0102319 0xc010325a 0x804812c 0x8048a96 0x8048ac8.
+@end example
+
+@node GDB
+@section GDB
+
+You can run Pintos under the supervision of the GDB debugger.
+First, start Pintos with the @option{--gdb} option, e.g.@:
+@command{pintos --gdb -- run mytest}.  Second, open a second terminal on
+the same machine and
+use @command{pintos-gdb} to invoke GDB on
+@file{kernel.o}:@footnote{@command{pintos-gdb} is a wrapper around
+@command{gdb} (80@var{x}86) or @command{i386-elf-gdb} (SPARC) that loads
+the Pintos macros at startup.}
+@example
+pintos-gdb kernel.o
+@end example
+@noindent and issue the following GDB command:
+@example
+target remote localhost:1234
+@end example
+
+Now GDB is connected to the simulator over a local
+network connection.  You can now issue any normal GDB
+commands.  If you issue the @samp{c} command, the simulated BIOS will take
+control, load Pintos, and then Pintos will run in the usual way.  You
+can pause the process at any point with @key{Ctrl+C}.
+
+@menu
+* Using GDB::                   
+* Example GDB Session::         
+* GDB FAQ::                     
+@end menu
+
+@node Using GDB
+@subsection Using GDB
+
+You can read the GDB manual by typing @code{info gdb} at a
+terminal command prompt.  Here's a few commonly useful GDB commands:
+
+@deffn {GDB Command} c
+Continues execution until @key{Ctrl+C} or the next breakpoint.
+@end deffn
+
+@deffn {GDB Command} break function
+@deffnx {GDB Command} break file:line
+@deffnx {GDB Command} break *address
+Sets a breakpoint at @var{function}, at @var{line} within @var{file}, or
+@var{address}.
+(Use a @samp{0x} prefix to specify an address in hex.)
+
+Use @code{break main} to make GDB stop when Pintos starts running.
+@end deffn
+
+@deffn {GDB Command} p expression
+Evaluates the given @var{expression} and prints its value.
+If the expression contains a function call, that function will actually
+be executed.
+@end deffn
+
+@deffn {GDB Command} l *address
+Lists a few lines of code around @var{address}.
+(Use a @samp{0x} prefix to specify an address in hex.)
+@end deffn
+
+@deffn {GDB Command} bt
+Prints a stack backtrace similar to that output by the
+@command{backtrace} program described above.
+@end deffn
+
+@deffn {GDB Command} p/a address
+Prints the name of the function or variable that occupies @var{address}.
+(Use a @samp{0x} prefix to specify an address in hex.)
+@end deffn
+
+@deffn {GDB Command} diassemble function
+Disassembles @var{function}.
+@end deffn
+
+We also provide a set of macros specialized for debugging Pintos,
+written by Godmar Back @email{gback@@cs.vt.edu}.  You can type
+@code{help user-defined} for basic help with the macros.  Here is an
+overview of their functionality, based on Godmar's documentation:
+
+@deffn {GDB Macro} debugpintos
+Attach debugger to a waiting pintos process on the same machine.
+Shorthand for @code{target remote localhost:1234}.
+@end deffn
+
+@deffn {GDB Macro} dumplist &list type element
+Prints the elements of @var{list}, which should be a @code{struct} list
+that contains elements of the given @var{type} (without the word
+@code{struct}) in which @var{element} is the @struct{list_elem} member
+that links the elements.
+
+Example: @code{dumplist &all_list thread allelem} prints all elements of
+@struct{thread} that are linked in @code{struct list all_list} using the
+@code{struct list_elem allelem} which is part of @struct{thread}.
+@end deffn
+
+@deffn {GDB Macro} btthread thread
+Shows the backtrace of @var{thread}, which is a pointer to the
+@struct{thread} of the thread whose backtrace it should show.  For the
+current thread, this is identical to the @code{bt} (backtrace) command.
+It also works for any thread suspended in @func{schedule},
+provided you know where its kernel stack page is located.
+@end deffn
+
+@deffn {GDB Macro} btthreadlist list element
+Shows the backtraces of all threads in @var{list}, the @struct{list} in
+which the threads are kept.  Specify @var{element} as the
+@struct{list_elem} field used inside @struct{thread} to link the threads
+together.
+
+Example: @code{btthreadlist all_list allelem} shows the backtraces of
+all threads contained in @code{struct list all_list}, linked together by
+@code{allelem}.  This command is useful to determine where your threads
+are stuck when a deadlock occurs.  Please see the example scenario below.
+@end deffn
+
+@deffn {GDB Macro} btthreadall
+Short-hand for @code{btthreadlist all_list allelem}.
+@end deffn
+
+@deffn {GDB Macro} btpagefault
+Print a backtrace of the current thread after a page fault exception.
+Normally, when a page fault exception occurs, GDB will stop
+with a message that might say:@footnote{To be precise, GDB will stop
+only when running under Bochs.  When running under QEMU, you must
+set a breakpoint in the @code{page_fault} function to stop execution 
+when a page fault occurs. In that case, the @code{btpagefault} macro is
+unnecessary.}
+
+@example
+Program received signal 0, Signal 0.
+0xc0102320 in intr0e_stub ()
+@end example
+
+In that case, the @code{bt} command might not give a useful
+backtrace.  Use @code{btpagefault} instead.
+
+You may also use @code{btpagefault} for page faults that occur in a user
+process.  In this case, you may wish to also load the user program's
+symbol table using the @code{loadusersymbols} macro, as described above.
+@end deffn
+
+@deffn {GDB Macro} hook-stop
+GDB invokes this macro every time the simulation stops, which Bochs will
+do for every processor exception, among other reasons.  If the
+simulation stops due to a page fault, @code{hook-stop} will print a
+message that says and explains further whether the page fault occurred
+in the kernel or in user code.
+
+If the exception occurred from user code, @code{hook-stop} will say:
+@example
+pintos-debug: a page fault exception occurred in user mode
+pintos-debug: hit 'c' to continue, or 's' to step to intr_handler
+@end example
+
+In Project 2, a page fault in a user process leads to the termination of
+the process.  You should expect those page faults to occur in the
+robustness tests where we test that your kernel properly terminates
+processes that try to access invalid addresses.  To debug those, set a
+break point in @func{page_fault} in @file{exception.c}, which you will
+need to modify accordingly.
+
+In Project 3, a page fault in a user process no longer automatically
+leads to the termination of a process.  Instead, it may require reading in
+data for the page the process was trying to access, either
+because it was swapped out or because this is the first time it's
+accessed.  In either case, you will reach @func{page_fault} and need to
+take the appropriate action there.
+
+If the page fault did not occur in user mode while executing a user
+process, then it occurred in kernel mode while executing kernel code.
+In this case, @code{hook-stop} will print this message:
+@example
+pintos-debug: a page fault occurred in kernel mode
+@end example
+followed by the output of the @code{btpagefault} command.
+
+Before Project 3, a page fault exception in kernel code is always a bug
+in your kernel, because your kernel should never crash.  Starting with
+Project 3, the situation will change if you use the @func{get_user} and
+@func{put_user} strategy to verify user memory accesses
+(@pxref{Accessing User Memory}).
+
+@c ----
+@c Unfortunately, this does not work with Bochs's gdb stub.
+@c ----
+@c If you don't want GDB to stop for page faults, then issue the command
+@c @code{handle SIGSEGV nostop}.  GDB will still print a message for
+@c every page fault, but it will not come back to a command prompt.
+@end deffn
+
+@node Example GDB Session
+@subsection Example GDB Session
+
+This section narrates a sample GDB session, provided by Godmar Back.
+This example illustrates how one might debug a Project 1 solution in
+which occasionally a thread that calls @func{timer_sleep} is not woken
+up.  With this bug, tests such as @code{mlfqs_load_1} get stuck.
+
+This session was captured with a slightly older version of Bochs and the
+GDB macros for Pintos, so it looks slightly different than it would now.
+Program output is shown in normal type, user input in @strong{strong}
+type.
+
+First, I start Pintos:
+
+@smallexample
+$ @strong{pintos -v --gdb -- -q -mlfqs run mlfqs-load-1}
+Writing command line to /tmp/gDAlqTB5Uf.dsk...
+bochs -q
+========================================================================
+                       Bochs x86 Emulator 2.2.5
+             Build from CVS snapshot on December 30, 2005
+========================================================================
+00000000000i[     ] reading configuration from bochsrc.txt
+00000000000i[     ] Enabled gdbstub
+00000000000i[     ] installing nogui module as the Bochs GUI
+00000000000i[     ] using log file bochsout.txt
+Waiting for gdb connection on localhost:1234
+@end smallexample
+
+@noindent Then, I open a second window on the same machine and start GDB:
+
+@smallexample
+$ @strong{pintos-gdb kernel.o}
+GNU gdb Red Hat Linux (6.3.0.0-1.84rh)
+Copyright 2004 Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain conditions.
+Type "show copying" to see the conditions.
+There is absolutely no warranty for GDB.  Type "show warranty" for details.
+This GDB was configured as "i386-redhat-linux-gnu"...
+Using host libthread_db library "/lib/libthread_db.so.1".
+@end smallexample
+
+@noindent Then, I tell GDB to attach to the waiting Pintos emulator:
+
+@smallexample
+(gdb) @strong{debugpintos}
+Remote debugging using localhost:1234
+0x0000fff0 in ?? ()
+Reply contains invalid hex digit 78
+@end smallexample
+
+@noindent Now I tell Pintos to run by executing @code{c} (short for
+@code{continue}) twice:
+
+@smallexample
+(gdb) @strong{c}
+Continuing.
+Reply contains invalid hex digit 78
+(gdb) @strong{c}
+Continuing.
+@end smallexample
+
+@noindent Now Pintos will continue and output:
+
+@smallexample
+Pintos booting with 4,096 kB RAM...
+Kernel command line: -q -mlfqs run mlfqs-load-1
+374 pages available in kernel pool.
+373 pages available in user pool.
+Calibrating timer...  102,400 loops/s.
+Boot complete.
+Executing 'mlfqs-load-1':
+(mlfqs-load-1) begin
+(mlfqs-load-1) spinning for up to 45 seconds, please wait...
+(mlfqs-load-1) load average rose to 0.5 after 42 seconds
+(mlfqs-load-1) sleeping for another 10 seconds, please wait...
+@end smallexample
+
+@noindent 
+@dots{}until it gets stuck because of the bug I had introduced.  I hit
+@key{Ctrl+C} in the debugger window:
+
+@smallexample
+Program received signal 0, Signal 0.
+0xc010168c in next_thread_to_run () at ../../threads/thread.c:649
+649	  while (i <= PRI_MAX && list_empty (&ready_list[i]))
+(gdb) 
+@end smallexample
+
+@noindent 
+The thread that was running when I interrupted Pintos was the idle
+thread.  If I run @code{backtrace}, it shows this backtrace:
+
+@smallexample
+(gdb) @strong{bt}
+#0  0xc010168c in next_thread_to_run () at ../../threads/thread.c:649
+#1  0xc0101778 in schedule () at ../../threads/thread.c:714
+#2  0xc0100f8f in thread_block () at ../../threads/thread.c:324
+#3  0xc0101419 in idle (aux=0x0) at ../../threads/thread.c:551
+#4  0xc010145a in kernel_thread (function=0xc01013ff , aux=0x0)
+    at ../../threads/thread.c:575
+#5  0x00000000 in ?? ()
+@end smallexample
+
+@noindent 
+Not terribly useful.  What I really like to know is what's up with the
+other thread (or threads).  Since I keep all threads in a linked list
+called @code{all_list}, linked together by a @struct{list_elem} member
+named @code{allelem}, I can use the @code{btthreadlist} macro from the
+macro library I wrote.  @code{btthreadlist} iterates through the list of
+threads and prints the backtrace for each thread:
+
+@smallexample
+(gdb) @strong{btthreadlist all_list allelem}
+pintos-debug: dumping backtrace of thread 'main' @@0xc002f000
+#0  0xc0101820 in schedule () at ../../threads/thread.c:722
+#1  0xc0100f8f in thread_block () at ../../threads/thread.c:324
+#2  0xc0104755 in timer_sleep (ticks=1000) at ../../devices/timer.c:141
+#3  0xc010bf7c in test_mlfqs_load_1 () at ../../tests/threads/mlfqs-load-1.c:49
+#4  0xc010aabb in run_test (name=0xc0007d8c "mlfqs-load-1")
+    at ../../tests/threads/tests.c:50
+#5  0xc0100647 in run_task (argv=0xc0110d28) at ../../threads/init.c:281
+#6  0xc0100721 in run_actions (argv=0xc0110d28) at ../../threads/init.c:331
+#7  0xc01000c7 in main () at ../../threads/init.c:140
+
+pintos-debug: dumping backtrace of thread 'idle' @@0xc0116000
+#0  0xc010168c in next_thread_to_run () at ../../threads/thread.c:649
+#1  0xc0101778 in schedule () at ../../threads/thread.c:714
+#2  0xc0100f8f in thread_block () at ../../threads/thread.c:324
+#3  0xc0101419 in idle (aux=0x0) at ../../threads/thread.c:551
+#4  0xc010145a in kernel_thread (function=0xc01013ff , aux=0x0)
+    at ../../threads/thread.c:575
+#5  0x00000000 in ?? ()
+@end smallexample
+
+@noindent 
+In this case, there are only two threads, the idle thread and the main
+thread.  The kernel stack pages (to which the @struct{thread} points)
+are at @t{0xc0116000} and @t{0xc002f000}, respectively.  The main thread
+is stuck in @func{timer_sleep}, called from @code{test_mlfqs_load_1}.
+
+Knowing where threads are stuck can be tremendously useful, for instance
+when diagnosing deadlocks or unexplained hangs.
+
+@deffn {GDB Macro} loadusersymbols
+
+You can also use GDB to debug a user program running under Pintos.  
+To do that, use the @code{loadusersymbols} macro to load the program's 
+symbol table:
+@example
+loadusersymbols @var{program}
+@end example
+@noindent
+where @var{program} is the name of the program's executable (in the host
+file system, not in the Pintos file system).  For example, you may issue:
+@smallexample
+(gdb) @strong{loadusersymbols tests/userprog/exec-multiple}
+add symbol table from file "tests/userprog/exec-multiple" at
+    .text_addr = 0x80480a0
+(gdb) 
+@end smallexample
+
+After this, you should be
+able to debug the user program the same way you would the kernel, by
+placing breakpoints, inspecting data, etc.  Your actions apply to every
+user program running in Pintos, not just to the one you want to debug,
+so be careful in interpreting the results:  GDB does not know
+which process is currently active (because that is an abstraction 
+the Pintos kernel creates).  Also, a name that appears in
+both the kernel and the user program will actually refer to the kernel
+name.  (The latter problem can be avoided by giving the user executable
+name on the GDB command line, instead of @file{kernel.o}, and then using
+@code{loadusersymbols} to load @file{kernel.o}.)
+@code{loadusersymbols} is implemented via GDB's @code{add-symbol-file}
+command.
+
+@end deffn
+
+@node GDB FAQ
+@subsection FAQ
+
+@table @asis
+@item GDB can't connect to Bochs.
+
+If the @command{target remote} command fails, then make sure that both
+GDB and @command{pintos} are running on the same machine by
+running @command{hostname} in each terminal.  If the names printed
+differ, then you need to open a new terminal for GDB on the
+machine running @command{pintos}.
+
+@item GDB doesn't recognize any of the macros.
+
+If you start GDB with @command{pintos-gdb}, it should load the Pintos
+macros automatically.  If you start GDB some other way, then you must
+issue the command @code{source @var{pintosdir}/src/misc/gdb-macros},
+where @var{pintosdir} is the root of your Pintos directory, before you
+can use them.
+
+@item Can I debug Pintos with DDD?
+
+Yes, you can.  DDD invokes GDB as a subprocess, so you'll need to tell
+it to invokes @command{pintos-gdb} instead:
+@example
+ddd --gdb --debugger pintos-gdb
+@end example
+
+@item Can I use GDB inside Emacs?
+
+Yes, you can.  Emacs has special support for running GDB as a
+subprocess.  Type @kbd{M-x gdb} and enter your @command{pintos-gdb}
+command at the prompt.  The Emacs manual has information on how to use
+its debugging features in a section titled ``Debuggers.''
+
+@item GDB is doing something weird.
+
+If you notice strange behavior while using GDB, there
+are three possibilities: a bug in your
+modified Pintos, a bug in Bochs's
+interface to GDB or in GDB itself, or
+a bug in the original Pintos code.  The first and second
+are quite likely, and you should seriously consider both.  We hope
+that the third is less likely, but it is also possible.
+@end table
+
+@node Triple Faults
+@section Triple Faults
+
+When a CPU exception handler, such as a page fault handler, cannot be
+invoked because it is missing or defective, the CPU will try to invoke
+the ``double fault'' handler.  If the double fault handler is itself
+missing or defective, that's called a ``triple fault.''  A triple fault
+causes an immediate CPU reset.
+
+Thus, if you get yourself into a situation where the machine reboots in
+a loop, that's probably a ``triple fault.''  In a triple fault
+situation, you might not be able to use @func{printf} for debugging,
+because the reboots might be happening even before everything needed for
+@func{printf} is initialized.
+
+There are at least two ways to debug triple faults.  First, you can run
+Pintos in Bochs under GDB (@pxref{GDB}).  If Bochs has been built
+properly for Pintos, a triple fault under GDB will cause it to print the
+message ``Triple fault: stopping for gdb'' on the console and break into
+the debugger.  (If Bochs is not running under GDB, a triple fault will
+still cause it to reboot.)  You can then inspect where Pintos stopped,
+which is where the triple fault occurred.
+
+Another option is what I call ``debugging by infinite loop.''
+Pick a place in the Pintos code, insert the infinite loop
+@code{for (;;);} there, and recompile and run.  There are two likely
+possibilities:
+
+@itemize @bullet
+@item
+The machine hangs without rebooting.  If this happens, you know that
+the infinite loop is running.  That means that whatever caused the
+reboot must be @emph{after} the place you inserted the infinite loop.
+Now move the infinite loop later in the code sequence.
+
+@item
+The machine reboots in a loop.  If this happens, you know that the
+machine didn't make it to the infinite loop.  Thus, whatever caused the
+reboot must be @emph{before} the place you inserted the infinite loop.
+Now move the infinite loop earlier in the code sequence.
+@end itemize
+
+If you move around the infinite loop in a ``binary search'' fashion, you
+can use this technique to pin down the exact spot that everything goes
+wrong.  It should only take a few minutes at most.
+
+@node Modifying Bochs
+@section Modifying Bochs
+
+An advanced debugging technique is to modify and recompile the
+simulator.  This proves useful when the simulated hardware has more
+information than it makes available to the OS.  For example, page
+faults have a long list of potential causes, but the hardware does not
+report to the OS exactly which one is the particular cause.
+Furthermore, a bug in the kernel's handling of page faults can easily
+lead to recursive faults, but a ``triple fault'' will cause the CPU to
+reset itself, which is hardly conducive to debugging.
+
+In a case like this, you might appreciate being able to make Bochs
+print out more debug information, such as the exact type of fault that
+occurred.  It's not very hard.  You start by retrieving the source
+code for Bochs 2.2.6 from @uref{http://bochs.sourceforge.net} and
+saving the file @file{bochs-2.2.6.tar.gz} into a directory.  
+The script @file{pintos/src/misc/bochs-2.2.6-build.sh}
+applies a number of patches contained in @file{pintos/src/misc}
+to the Bochs tree, then builds Bochs and installs it in a directory
+of your choice.
+Run this script without arguments to learn usage instructions.
+To use your @file{bochs} binary with @command{pintos},
+put it in your @env{PATH}, and make sure that it is earlier than
+@file{@value{localpintosbindir}/bochs}.
+
+Of course, to get any good out of this you'll have to actually modify
+Bochs.  Instructions for doing this are firmly out of the scope of
+this document.  However, if you want to debug page faults as suggested
+above, a good place to start adding @func{printf}s is
+@func{BX_CPU_C::dtranslate_linear} in @file{cpu/paging.cc}.
+
+@node Debugging Tips
+@section Tips
+
+The page allocator in @file{threads/palloc.c} and the block allocator in
+@file{threads/malloc.c} clear all the bytes in memory to
+@t{0xcc} at time of free.  Thus, if you see an attempt to
+dereference a pointer like @t{0xcccccccc}, or some other reference to
+@t{0xcc}, there's a good chance you're trying to reuse a page that's
+already been freed.  Also, byte @t{0xcc} is the CPU opcode for ``invoke
+interrupt 3,'' so if you see an error like @code{Interrupt 0x03 (#BP
+Breakpoint Exception)}, then Pintos tried to execute code in a freed page or
+block.
+
+An assertion failure on the expression @code{sec_no < d->capacity}
+indicates that Pintos tried to access a file through an inode that has
+been closed and freed.  Freeing an inode clears its starting sector
+number to @t{0xcccccccc}, which is not a valid sector number for disks
+smaller than about 1.6 TB.

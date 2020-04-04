@@ -1,0 +1,295 @@
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="Author" CONTENT="Joshua Neal">
+   <META NAME="Description" CONTENT="Pure VGA/SVGA hardware programming (registers, identification, and otherlow-level stuff.)">
+   <META NAME="KeyWords" CONTENT="VGA SVGA hardware video programming">
+   <TITLE>FreeVGA--Special Effects Hardware</TITLE>
+</HEAD>
+<BODY>
+
+<CENTER><A HREF="../home.htm">Home</A> <A HREF="#intro">Intro</A> <A HREF="#window">Windowing</A>
+<A HREF="#paging">Paging</A> <A HREF="#smooth">Smooth Scrolling</A> <A HREF="#split">Split-Screen</A>
+<A HREF="vga.htm#general">Back
+<HR WIDTH="100%"></A><B>Hardware Level VGA and SVGA Video Programming Information
+Page</B></CENTER>
+
+<CENTER>Special Effects Hardware&nbsp;
+<HR WIDTH="100%"></CENTER>
+
+<UL>
+<LI>
+<A HREF="#intro">Introduction</A> -- describes the capabilities of the
+VGA special effects hardware.</LI>
+
+<LI>
+<A HREF="#window">Windowing</A> -- provides rough panning and scrolling
+of a larger virtual image.</LI>
+
+<LI>
+<A HREF="#paging">Paging</A> -- provides the ability to switch between
+multiple screens rapidly.</LI>
+
+<LI>
+<A HREF="#smooth">Smooth Panning and Scrolling</A> -- provides more precise
+control when panning and scrolling.</LI>
+
+<LI>
+<A HREF="#split">Split-Screen Operation</A> -- provides a horizontal division
+which allows independent scrolling and panning of the top window.</LI>
+</UL>
+<A NAME="intro"></A><B>Introduction</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This section describes the
+capabilities of the VGA hardware that can be used to implement special
+effects such as windowing, paging, smooth panning and scrolling, and split
+screen operation.. These functions are probably the least utilized of all
+of the VGA's capabilities, possibly because most texts devoted to video
+hardware provide only brief documentation. Also, the video BIOS provides
+no support for these capabilities so the VGA card must be programmed at
+the hardware level in order to utilize these capabilities. Windowing allows
+a program to view a portion of an image in display memory larger than the
+current display resolution, providing rough panning and scrolling. Paging
+allows multiple display screens to be stored in the display memory allowing
+rapid switching between them. Smooth panning and scrolling works in conjunction
+with windowing to provide more precise control of window position. Split-screen
+operation allows the creation of a horizontal division on the screen that
+creates a window below that remains fixed in place independent of the panning
+and scrolling of the window above. These features can be combined to provide
+powerful control of the display with minimal demand on the host CPU.
+
+<P><A NAME="window"></A><B>Windowing</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The VGA hardware has the
+ability treat the display as a window which can pan and/or scroll across
+an image larger than the screen, which is used by some windowing systems
+to provide a virtual scrolling desktop, and by some games and assembly
+demos to provide scrolling. Some image viewers use this to allow viewing
+of images larger than the screen. This capability is not limited to graphics
+mode; some terminal programs use this capability to provide a scroll-back
+buffer, and some editors use this to provide an editing screen wider than
+80 columns.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This feature can be implemented
+by brute force by simply copying the portion of the image to be displayed
+to the screen. Doing this, however takes significant processor horsepower.
+For example, scrolling a 256 color 320x200 display at 30 frames per second
+by brute force requires a data transfer rate of 1.92 megabytes/second.
+However, using the hardware capability of the VGA the same operation would
+require a data transfer rate of only 120 bytes/second. Obviously there
+is an advantage to using the VGA hardware. However, there are some limitations--one
+being that the entire screen must scroll (or the top portion of the screen
+if split-screen mode is used.) and the other being that the maximum size
+of the virtual image is limited to the amount of video memory accessible,
+although it is possible to redraw portions of the display memory to display
+larger virtual images.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; In text mode, windowing
+allows panning at the character resolution. In graphics mode, windowing
+allows panning at 8-bit resolution and scrolling at scan-line resolution.
+For more precise control, see <A HREF="#smooth">Smooth Panning and Scrolling</A>
+below. Because the VGA BIOS and most programming environment's graphics
+libraries do not support windowing, you must modify or write your own routines
+to write to the display for functions such as writing text or graphics.
+This section assumes that you have the ability to work with the custom
+resolutions possible when windowing is used.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; In order to understand virtual
+resolutions it is necessary to understand how the VGA's <A HREF="crtcreg.htm#0C">Start
+Address High Register</A>, <A HREF="crtcreg.htm#0D">Start Address Low Register</A>,
+and <A HREF="crtcreg.htm#13">Offset</A> field work. Because display memory
+in the VGA is accessed by a 32-bit bus, a 16-bit address is sufficient
+to uniquely identify any location in the VGA's 256K address space. The
+<A HREF="crtcreg.htm#0C">Start Address High Register</A> and <A HREF="crtcreg.htm#0D">Start
+Address Low Register</A> provide such an address. This address is used
+to specify either the location of the first character in text mode or the
+position of the first byte of pixels in graphics mode. At the end of the
+vertical retrace, the current line start address is loaded with this value.
+This causes one scan line of pixels or characters to be output starting
+at this address. At the beginning of the next scan-line (or character row
+in text mode) the value of the <A HREF="crtcreg.htm#13">Offset Register</A>
+multiplied by the current memory address size * 2 is added to the current
+line start address. The <A HREF="crtcreg.htm#14">Double-Word Addressing</A>
+field and the <A HREF="crtcreg.htm#17">Word/Byte</A> field specify the
+current memory address size. If the value of the <A HREF="crtcreg.htm#14">Double-Word
+Addressing</A> field is 1, then the current memory address size is four
+(double-word). Otherwise, the <A HREF="crtcreg.htm#17">Word/Byte</A> field
+specifies the current memory address size. If the value of the <A HREF="crtcreg.htm#17">Word/Byte</A>
+field is 0 then the current memory address size is 2 (word) otherwise,
+the current memory address size is 1 (byte).
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Normally in graphics modes,
+the offset register is programmed to represent (after multiplication) the
+number of bytes in a scan line. This means that (unless a CGA/MDA emulation
+mode is in effect) scan lines will be arranged sequentially in memory with
+no space in between, allowing for the most compact representation in display
+memory. However, this does not have to be the case--in fact, by increasing
+the value of the offset register we can leave "extra space" between lines.
+This is what provides for virtual widths. By programming the offset register
+to the value of the equation:
+
+<P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <B>Offset = VirtualWidth
+/ ( PixelsPerAddress * MemoryAddressSize * 2 )</B>
+
+<P>VirtualWidth is the width of the virtual resolution in pixels, and PixelsPerAddress
+is the number of pixels per display memory address (1, 2, 4 or 8) depending
+on the current video mode. For virtual text modes, the offset register
+is programmed with the value of the equation:
+
+<P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <B>Offset = VirtualWidth
+/ ( MemoryAddressSize * 2 )</B>
+
+<P>In text mode, there is always one character per display memory address.
+In standard CGA compatible text modes, MemoryAddressSize is 2 (word).
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; After you have programmed
+the new offset, the screen will now display only a portion of a virtual
+display. The screen will display the number of scan-lines as specified
+by the current mode. If the screen reaches the last byte of memory, the
+next byte of memory will wrap around to the first byte of memory. Remember
+that the Start Address specifies the display memory address of the upper-left
+hand character or pixel. Thus the maximum height of a virtual screen depends
+on the width of the virtual screen. By increasing this by the number of
+bytes in a scan-line (or character row), the display will scroll one scan-line
+or character row vertically downwards. By increasing the Start Address
+by less than the number of bytes in a scan line, you can move the virtual
+window horizontally to the right. If the virtual width is the same as the
+actual width, one can create a vertical scrolling mode. This is used sometimes
+as an "elevator" mode or to provide rapid scrollback capability in text
+mode. If the virtual height is the same as the actual height, then only
+horizontal panning is possible, sometimes called "panoramic" mode. In any
+case, the equation for calculating the Start Address is:
+
+<P><B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Start Address = StartingOffset
++ Y * BytesPerVirtualRow + X</B>
+
+<P>Y is the vertical position, from 0 to the value of the VitrualHeight
+- ActualHeight. X is the horizontal position, from 0 to the value of BytesPerVirtualRow
+- BytesPerActualRow . These ranges prevent wrapping around to the left
+side of the screen, although you may find it useful to use the wrap-around
+for whatever your purpose. Note that the wrap-around simply starts displaying
+the next row/scan-line rather than the current one, so is not that useful
+(except when using programming techniques that take this factor into account.)
+Normally StartingOffset is 0, but if paging or split-screen mode is being
+used, or even if you simply want to relocate the screen, you must change
+the starting offset to the address of the upper-left hand pixel of the
+virtual screen.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For example, a 512x300 virtual
+screen in a 320x200 16-color 1 bit/pixel planar display would require 512
+pixels / 8 pixels/byte = 64 bytes per row and 64 bytes/row * 300 lines
+= 19200 bytes per screen. Assuming the VGA is in byte addressing mode,
+this means that we need to program the offset register <A HREF="crtcreg.htm#13">Offset</A>
+field with 512 pixels / (8 pixels/byte * 1 * 2) = 32 (20h). Adding one
+to the start address will move the display screen to the right eight pixels.
+More precise control is provided by the smooth scrolling mechanism. Adding
+64 to the start address will move the virtual screen down one scan line.
+See the following chart which shows the virtual screen when the start address
+is calculated with an X and Y of 0:
+<CENTER><A HREF="virtual.txt"><IMG SRC="virtual.gif" ALT="Click for Textified Virtual Screen Mode Example" HEIGHT=256 WIDTH=376></A></CENTER>
+
+
+<P><A NAME="paging"></A><B>Paging</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The video display memory
+may be able to hold more than one screen of data (or virtual screen if
+virtual resolutions are used.) These multiple screens, called pages, allows
+rapid switching between them. As long as they both have the same actual
+(and virtual if applicable) resolution, simply changing the Start Address
+as given by the <A HREF="crtcreg.htm#0C">Start Address High Register</A>
+and <A HREF="crtcreg.htm#0D">Start Address Low Register</A> pair to point
+to the memory address of the first byte of the page (or set the StartingOffset
+term in the equation for virtual resolutions to the first memory address
+of the page.) If they have different virtual widths, then the <A HREF="crtcreg.htm#13">Offset</A>
+field must be reprogrammed. It is possible to store both graphics and text
+pages simultaneously in memory, in addition to different graphics mode
+pages. In this case, the video mode must be changed when changing pages.
+In addition, in text mode the Cursor Location must be reprogrammed for
+each page if it is to be displayed. Also paging allows for double buffering
+of the display -- the CPU can write to one page while the VGA hardware
+is displaying another. By switching between pages during the vertical retrace
+period, flicker free screen updates can be implemented.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; An example of paging is
+that used by the VGA BIOS in the 80x25 text mode. Each page of text takes
+up 2000 memory address locations, and the VGA uses a 32K memory aperture,
+with the Odd/Even addressing enabled. Because Odd/Even addressing is enabled,
+each page of text takes up 4000 bytes in host memory, thus 32768 / 4000
+= 8 (rounded down) pages can be provided and can be accessed at one time
+by the CPU. Each page starts at a multiple of 4096 (1000h). Because the
+display controller circuitry works independent of the host memory access
+mode, this means that each page starts at a display address that is a multiple
+of 2048 (800h), thus the Starting Address is programmed to the value obtained
+by multiplying the page to be displayed by 2048 (800h). See the following
+chart which shows the arrangement of these pages in display memory:
+<BR>&nbsp;
+<CENTER><A HREF="paging.txt"><IMG SRC="paging.gif" ALT="Click here to display a textified Paging Memory Utilization Example" HEIGHT=256 WIDTH=376></A></CENTER>
+
+
+<P><A NAME="smooth"></A><B>Smooth Panning and Scrolling</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Because the Start Address
+field only provides for scrolling and panning at the memory address level,
+more precise panning and scrolling capability is needed to scroll at the
+pixel level as multiple pixels may reside at the same memory address especially
+in text mode where the Start Address field only allows panning and scrolling
+at the character level.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Pixel level panning is controlled
+by the <A HREF="attrreg.htm#13">Pixel Shift Count</A> and <A HREF="crtcreg.htm#08">Byte
+Panning</A> fields. The <A HREF="attrreg.htm#13">Pixel Shift Count</A>
+field specifies the number of pixels to shift left. In all graphics modes
+and text modes except 9 dot text modes and 256 color graphics modes, the
+<A HREF="attrreg.htm#13">Pixel Shift Count</A> is defined for values 0-7.
+This provides the pixel level control not provided by the <A HREF="crtcreg.htm#0D">Start
+Address Register</A> or the <A HREF="crtcreg.htm#08">Byte Panning</A> fields.
+In 9 dot text modes the <A HREF="attrreg.htm#13">Pixel Shift Count</A>
+is field defined for values 8, and 0-7, with 8 being the minimum shift
+amount and 7 being the maximum. In 256 color graphics modes, due to the
+way the hardware makes a 256 color value by combining 2 16-bit values,
+the <A HREF="attrreg.htm#13">Pixel Shift Count</A> field is only defined
+for values 0, 2, 4, and 6. Values 1, 3, 5, and 7 cause the screen to be
+distorted due to the hardware combining 4 bits from each of 2 adjacent
+pixels. The <A HREF="crtcreg.htm#08">Byte Panning</A> field is added to
+the <A HREF="crtcreg.htm#0D">Start Address Register</A> when determining
+the address of the top-left hand corner of the screen, and has the value
+from 0-3. Combined, both panning fields allow a shift of 15, 31, or 35
+pixels, dependent upon the video mode. Note that programming the <A HREF="attrreg.htm#13">Pixel
+Shift Count</A> field to an undefined value may cause undesired effects
+and these effects are not guaranteed to be identical on all chipsets, so
+it is best to be avoided.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Pixel level scrolling is
+controlled by the <A HREF="crtcreg.htm#08">Preset Row Scan</A> field. This
+field may take any value from 0 up to the value of the <A HREF="crtcreg.htm#09">Maximum
+Scan Line</A> field; anything greater causes interesting artifacts (there
+is no guarantee that the result will be the same for all VGA chipsets.)
+Incrementing this value will shift the screen upwards by one scan line,
+allowing for smooth scrolling in modes where the Offset field does not
+provide precise control.
+
+<P><A NAME="split"></A><B>Split-screen Operation</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The VGA hardware provides
+the ability to specify a horizontal division which divides the screen into
+two windows which can start at separate display memory addresses. In addition,
+it provides the facility for panning the top window independent of the
+bottom window. The hardware does not provide for split-screen modes where
+multiple video modes are possible in one display screen as provided by
+some non-VGA graphics controllers. In addition, there are some limitations,
+the first being that the bottom window's starting display memory address
+is fixed at 0. This means that (unless you are using split screen mode
+to duplicate memory on purpose) the bottom screen must be located first
+in memory and followed by the top. The second limitation is that either
+both windows are panned by the same amount, or only the top window pans,
+in which case, the bottom window's panning values are fixed at 0. Another
+limitation is that the <A HREF="crtcreg.htm#08">Preset Row Scan</A> field
+only applies to the top window -- the bottom window has an effective Preset
+Row Scan value of 0.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The Line Compare field in
+the VGA, of which bit 9 is in the <A HREF="crtcreg.htm#09">Maximum Scan
+Line Register</A>, bit 8 is in the <A HREF="crtcreg.htm#07">Overflow Register</A>,
+and bits 7-0 are in the <A HREF="crtcreg.htm#18">Line Compare Register</A>,
+specifies the scan line address of the horizontal division. When the line
+counter reaches the value in the Line Compare Register, the current scan
+line start address is reset to 0. If the <A HREF="attrreg.htm#10">Pixel
+Panning Mode</A> field is set to 1 then the <A HREF="attrreg.htm#13">Pixel
+Shift Count</A> and <A HREF="crtcreg.htm#08">Byte Panning</A> fields are
+reset to 0 for the remainder of the display cycle allowing the top window
+to pan while the bottom window remains fixed. Otherwise, both windows pan
+by the same amount.
+<BR>&nbsp;
+
+<P>Notice: All trademarks used or referred to on this page are the property
+of their respective owners.
+<BR>All pages are Copyright &copy; 1997, 1998, J. D. Neal, except where
+noted. Permission for utilization and distribution is subject to the terms
+of the <A HREF="license.htm">FreeVGA Project Copyright License</A>.
+</BODY>
+</HTML>

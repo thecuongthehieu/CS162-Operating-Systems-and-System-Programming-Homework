@@ -1,0 +1,402 @@
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="Author" CONTENT="Joshua Neal">
+   <META NAME="Description" CONTENT="Pure VGA/SVGA hardware programming (registers, identification, and otherlow-level stuff.)">
+   <META NAME="KeyWords" CONTENT="VGA SVGA hardware video programming">
+   <TITLE>VGA/SVGA Video Programming--VGA Functional Index</TITLE>
+</HEAD>
+<BODY>
+
+<CENTER><A HREF="../home.htm">Home</A> <A HREF="#register">Register</A>
+<A HREF="#memory">Memory</A> <A HREF="#sequencer">Sequencing</A> <A HREF="#cursor">Cursor</A>
+<A HREF="#attribute">Attribute</A> <A HREF="#DAC">DAC</A> <A HREF="#display">Display</A>
+<A HREF="#misc">Misc</A> <A HREF="vga.htm#index">Back</A>&nbsp;
+<HR WIDTH="100%"><B>Hardware Level VGA and SVGA Video Programming Information
+Page</B></CENTER>
+
+<CENTER>VGA Functional Index&nbsp;
+<HR WIDTH="100%"></CENTER>
+
+
+<P><A NAME="register"></A><B>Register Access Functions</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; These fields control the
+acessability/inaccessability of the VGA registers. These registers are
+used for compatibiltiy with older programs that may attempt to program
+the VGA in a fashion suited only to an EGA, CGA, or monochrome card.
+<UL>
+<LI>
+CRTC Registers Protect Enable -- <A HREF="crtcreg.htm#11">Vertical Retrace
+End Register</A></LI>
+
+<LI>
+Enable Vertical Retrace Access -- <A HREF="crtcreg.htm#03">End Horizontal
+Blanking Register</A></LI>
+
+<LI>
+Input/Output Address Select -- <A HREF="extreg.htm#3CCR3C2W">Miscellaneous
+Output Register</A></LI>
+</UL>
+<A NAME="memory"></A><B>Display Memory Access Functions</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; These fields control the
+way the video RAM is mapped into the host CPU's address space and how memory
+reads/writes affect the display memory.
+<UL>
+<LI>
+Bit Mask -- <A HREF="graphreg.htm#08">Bit Mask Register</A></LI>
+
+<LI>
+Chain 4 Enable -- <A HREF="seqreg.htm#04">Sequencer Memory Mode Register</A></LI>
+
+<LI>
+Chain Odd/Even Enable -- <A HREF="graphreg.htm#06">Miscellaneous Graphics
+Register</A></LI>
+
+<LI>
+Color Compare -- <A HREF="graphreg.htm#02">Color Compare Register</A></LI>
+
+<LI>
+Color Don't Care -- <A HREF="graphreg.htm#07">Color Don't Care Register</A></LI>
+
+<LI>
+Enable Set/Reset -- <A HREF="graphreg.htm#01">Enable Set/Reset Register</A></LI>
+
+<LI>
+Extended Memory -- <A HREF="seqreg.htm#04">Sequencer Memory Mode Register</A></LI>
+
+<LI>
+Host Odd/Even Memory Read Addressing Enable -- <A HREF="graphreg.htm#05">Graphics
+Mode Register</A></LI>
+
+<LI>
+Host Odd/Even Memory Write Addressing Enable -- <A HREF="seqreg.htm#04">Sequencer
+Memory Mode Register</A></LI>
+
+<LI>
+Logical Operation -- <A HREF="graphreg.htm#03">Data Rotate Register</A></LI>
+
+<LI>
+Memory Map Select -- <A HREF="graphreg.htm#06">Miscellaneous Graphics Register</A></LI>
+
+<LI>
+Memory Plane Write Enable -- <A HREF="seqreg.htm#02">Map Mask Register</A></LI>
+
+<LI>
+Odd/Even Page Select -- <A HREF="extreg.htm#3CCR3C2W">Miscellaneous Output
+Register</A></LI>
+
+<LI>
+RAM Enable -- <A HREF="extreg.htm#3CCR3C2W">Miscellaneous Output Register</A></LI>
+
+<LI>
+Read Map Select -- <A HREF="graphreg.htm#04">Read Map Select Register</A></LI>
+
+<LI>
+Read Mode - <A HREF="graphreg.htm#05">Graphics Mode Register</A></LI>
+
+<LI>
+Rotate Count -- <A HREF="graphreg.htm#03">Data Rotate Register</A></LI>
+
+<LI>
+Set/Reset -- <A HREF="graphreg.htm#00">Set/Reset Register</A></LI>
+
+<LI>
+Write Mode -- <A HREF="graphreg.htm#05">Graphics Mode Register</A></LI>
+</UL>
+<A NAME="sequencer"></A><B>Display Sequencing Functions</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; These fields affect the
+way the video memory is serialized for display.
+<UL>
+<LI>
+256-Color Shift Mode -- <A HREF="graphreg.htm#05">Graphics Mode Register</A></LI>
+
+<LI>
+9/8 Dot Mode -- <A HREF="seqreg.htm#01">Clocking Mode Register</A></LI>
+
+<LI>
+Address Wrap Select -- <A HREF="crtcreg.htm#17">CRTC Mode Control Register</A></LI>
+
+<LI>
+Alphanumeric Mode Disable -- <A HREF="graphreg.htm#06">Miscellaneous Graphics
+Register</A></LI>
+
+<LI>
+Asynchronous Reset -- <A HREF="seqreg.htm#00">Reset Register</A></LI>
+
+<LI>
+Byte Panning -- <A HREF="crtcreg.htm#08">Preset Row Scan Register</A></LI>
+
+<LI>
+Character Set A Select -- <A HREF="seqreg.htm#03">Character Map Select
+Register</A></LI>
+
+<LI>
+Character Set B Select -- <A HREF="seqreg.htm#03">Character Map Select
+Register</A></LI>
+
+<LI>
+Divide Memory Address Clock by 4 -- <A HREF="crtcreg.htm#14">Underline
+Location Register</A></LI>
+
+<LI>
+Double-Word Addressing -- <A HREF="crtcreg.htm#14">Underline Location Register</A></LI>
+
+<LI>
+Pixel Shift Count -- <A HREF="attrreg.htm#13">Horizontal Pixel Panning
+Register</A></LI>
+
+<LI>
+Line Compare -- bit 9: <A HREF="crtcreg.htm#09">Maximum Scan Line Register</A>,
+bit 8: <A HREF="crtcreg.htm#07">Overflow Register</A>, bits 7-0: <A HREF="crtcreg.htm#18">Line
+Compare Register</A></LI>
+
+<LI>
+Line Graphics Enable -- <A HREF="attrreg.htm#10">Attribute Mode Control
+Register</A></LI>
+
+<LI>
+Map Display Address 13 -- <A HREF="crtcreg.htm#17">CRTC Mode Control Register</A></LI>
+
+<LI>
+Map Display Address 14 -- <A HREF="crtcreg.htm#17">CRTC Mode Control Register</A></LI>
+
+<LI>
+Maximum Scan Line -- <A HREF="crtcreg.htm#09">Maximum Scan Line Register</A></LI>
+
+<LI>
+Offset -- <A HREF="crtcreg.htm#13">Offset Register</A></LI>
+
+<LI>
+Pixel Panning Mode -- <A HREF="attrreg.htm#10">Attribute Mode Control Register</A></LI>
+
+<LI>
+Preset Row Scan -- <A HREF="crtcreg.htm#08">Preset Row Scan Register</A></LI>
+
+<LI>
+Scan Doubling -- <A HREF="crtcreg.htm#09">Maximum Scan Line Register</A></LI>
+
+<LI>
+Screen Disable -- <A HREF="seqreg.htm#01">Clocking Mode Register</A></LI>
+
+<LI>
+Shift Four Enable -- <A HREF="seqreg.htm#01">Clocking Mode Register</A></LI>
+
+<LI>
+Shift/Load Rate -- <A HREF="seqreg.htm#01">Clocking Mode Register</A></LI>
+
+<LI>
+Shift Register Interleave Mode -- <A HREF="graphreg.htm#05">Graphics Mode
+Register</A></LI>
+
+<LI>
+Start Address -- bits 15-8: <A HREF="crtcreg.htm#0C">Start Address High
+Register</A>, bits 7-0: <A HREF="crtcreg.htm#0D">Start Address Low Register</A></LI>
+
+<LI>
+Sycnchronous Reset -- <A HREF="seqreg.htm#00">Reset Register</A></LI>
+
+<LI>
+Word/Byte Mode Select -- <A HREF="crtcreg.htm#17">CRTC Mode Control Register</A></LI>
+</UL>
+<A NAME="cursor"></A><B>Cursor Functions</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; These fields affect the
+operation of the cursor displayed while the VGA hardware is in text mode.
+<UL>
+<LI>
+Cursor Disable -- <A HREF="crtcreg.htm#0A">Cursor Start Reguster</A></LI>
+
+<LI>
+Cursor Location -- bits 15-8: <A HREF="crtcreg.htm#0E">Cursor Location
+High Register</A>, bits 7-0: <A HREF="crtcreg.htm#0F">Cursor Location Low
+Register</A></LI>
+
+<LI>
+Cursor Scan Line End -- <A HREF="crtcreg.htm#0B">Cursor End Register</A></LI>
+
+<LI>
+Cursor Scan Line Start -- <A HREF="crtcreg.htm#0A">Cursor Start Reguster</A></LI>
+
+<LI>
+Cursor Skew -- <A HREF="crtcreg.htm#0B">Cursor End Register</A></LI>
+</UL>
+<A NAME="attribute"></A><B>Attribute Functions</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; These fields control the
+way the video data is submitted to the RAMDAC, providing color/blinking
+capability in text mode and facilitating the mapping of colors in graphics
+mode.
+<UL>
+<LI>
+8-bit Color Enable -- <A HREF="attrreg.htm#10">Attribute Mode Control Register</A></LI>
+
+<LI>
+Attribute Address -- <A HREF="attrreg.htm#3C0">Attribute Address Register</A></LI>
+
+<LI>
+Attribute Controller Graphics Enable -- <A HREF="attrreg.htm#10">Attribute
+Mode Control Register</A></LI>
+
+<LI>
+Blink Enable -- <A HREF="attrreg.htm#10">Attribute Mode Control Register</A></LI>
+
+<LI>
+Color Plane Enable -- <A HREF="attrreg.htm#12">Color Plane Enable Register</A></LI>
+
+<LI>
+Color Select 5-4 -- <A HREF="attrreg.htm#14">Color Select Register</A></LI>
+
+<LI>
+Color Select 7-6 -- <A HREF="attrreg.htm#14">Color Select Register</A></LI>
+
+<LI>
+Internal Palette Index -- <A HREF="attrreg.htm#000F">Palette Registers</A></LI>
+
+<LI>
+Monochrome Emulation -- <A HREF="attrreg.htm#10">Attribute Mode Control
+Register</A></LI>
+
+<LI>
+Overscan Palette Index -- <A HREF="attrreg.htm#11">Overscan Color Register</A></LI>
+
+<LI>
+Underline Location -- <A HREF="crtcreg.htm#14">Underline Location Register</A></LI>
+
+<LI>
+Palette Address Source -- <A HREF="attrreg.htm#3C0">Attribute Address Register</A></LI>
+
+<LI>
+Palette Bits 5-4 Select -- <A HREF="attrreg.htm#10">Attribute Mode Control
+Register</A></LI>
+</UL>
+<A NAME="DAC"></A><B>DAC Functions</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; These fields allow control
+of the VGA's 256-color palette that is part of the RAMDAC.
+<UL>
+<LI>
+DAC Write Address -- <A HREF="colorreg.htm#3C8">DAC Address Write Mode
+Register</A></LI>
+
+<LI>
+DAC Read Address -- <A HREF="colorreg.htm#3C7W">DAC Address Read Mode Register</A></LI>
+
+<LI>
+DAC Data -- <A HREF="colorreg.htm#3C9">DAC Data Register</A></LI>
+
+<LI>
+DAC State -- <A HREF="colorreg.htm#3C7R">DAC State Register</A></LI>
+</UL>
+<A NAME="display"></A><B>Display Generation Functions</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; These fields control the
+formatting and timing of the VGA's video signal output.
+<UL>
+<LI>
+Clock Select -- <A HREF="extreg.htm#3CCR3C2W">Miscellaneous Output Register</A></LI>
+
+<LI>
+Display Disabled -- <A HREF="extreg.htm#3xAR">Input Status #1 Register</A></LI>
+
+<LI>
+Display Enable Skew -- <A HREF="crtcreg.htm#03">End Horizontal Blanking
+Register</A></LI>
+
+<LI>
+Divide Scan Line Clock by 2 -- <A HREF="crtcreg.htm#17">CRTC Mode Control
+Register</A></LI>
+
+<LI>
+Dot Clock Rate -- <A HREF="seqreg.htm#01">Clocking Mode Register</A></LI>
+
+<LI>
+End Horizontal Display -- <A HREF="crtcreg.htm#01">End Horizontal Display
+Register</A></LI>
+
+<LI>
+End Horizontal Blanking -- bit 5: <A HREF="crtcreg.htm#05">End Horizontal
+Retrace Register</A>, bits 4-0: <A HREF="crtcreg.htm#03">End Horizontal
+Blanking Register</A>,</LI>
+
+<LI>
+End Horizontal Retrace -- <A HREF="crtcreg.htm#05">End Horizontal Retrace
+Register</A></LI>
+
+<LI>
+End Vertical Blanking -- <A HREF="crtcreg.htm#16">End Vertical Blanking
+Register</A></LI>
+
+<LI>
+Horizontal Retrace Skew -- <A HREF="crtcreg.htm#05">End Horizontal Retrace
+Register</A></LI>
+
+<LI>
+Horizontal Sync Polarity -- <A HREF="extreg.htm#3CCR3C2W">Miscellaneous
+Output Register</A></LI>
+
+<LI>
+Horizontal Total -- <A HREF="crtcreg.htm#00">Horizontal Total Register</A></LI>
+
+<LI>
+Memory Refresh Bandwidth -- <A HREF="crtcreg.htm#11">Vertical Retrace End
+Register</A></LI>
+
+<LI>
+Start Horizontal Blanking -- <A HREF="crtcreg.htm#02">Start Horizontal
+Blanking Register</A></LI>
+
+<LI>
+Start Horizontal Retrace -- <A HREF="crtcreg.htm#04">Start Horizontal Retrace
+Register</A></LI>
+
+<LI>
+Start Vertical Blanking -- bit 9: <A HREF="crtcreg.htm#09">Maximum Scan
+Line Register</A>, bit 8: <A HREF="crtcreg.htm#07">Overflow Register</A>,
+bits 7-0: <A HREF="crtcreg.htm#15">Start Vertical Blanking Register</A></LI>
+
+<LI>
+Sync Enable -- <A HREF="crtcreg.htm#17">CRTC Mode Control Register</A></LI>
+
+<LI>
+Vertical Display End -- bits 9-8: <A HREF="crtcreg.htm#07">Overflow Register</A>,
+bits 7-0: <A HREF="crtcreg.htm#12">Vertical Display End Register</A></LI>
+
+<LI>
+Vertical Retrace End -- <A HREF="crtcreg.htm#11">Vertical Retrace End Register</A></LI>
+
+<LI>
+Vertical Retrace -- <A HREF="extreg.htm#3xAR">Input Status #1 Register</A></LI>
+
+<LI>
+Vertical Retrace Start -- bits 9-8: <A HREF="crtcreg.htm#07">Overflow Register</A>,
+bits 7-0: <A HREF="crtcreg.htm#10">Vertical Retrace Start Register</A></LI>
+
+<LI>
+Vertical Sync Polarity -- <A HREF="extreg.htm#3CCR3C2W">Miscellaneous Output
+Register</A></LI>
+
+<LI>
+Vertical Total -- bits 9-8: <A HREF="crtcreg.htm#07">Overflow Register</A>,
+bits 7-0: <A HREF="crtcreg.htm#06">Vertical Total Register</A></LI>
+</UL>
+<A NAME="misc"></A><B>Miscellaneous Functions</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; These fields are used to
+detect the state of possible VGA hardware such as configuration switches/jumpers
+and feature connector inputs.
+<UL>
+<LI>
+Feature Control Bit 0 -- <A HREF="extreg.htm#3CAR3xAW">Feature Control
+Register</A></LI>
+
+<LI>
+Feature Control Bit 1 -- <A HREF="extreg.htm#3CAR3xAW">Feature Control
+Register</A></LI>
+
+<LI>
+Switch Sense -- <A HREF="extreg.htm#3C2R">Input Status #0 Register</A></LI>
+</UL>
+Notice: All trademarks used or referred to on this page are the property
+of their respective owners.
+<BR>All pages are Copyright &copy; 1997, 1998, J. D. Neal, except where
+noted. Permission for utilization and distribution is subject to the terms
+of the <A HREF="license.htm">FreeVGA Project Copyright License</A>.
+<BR>&nbsp;
+<BR>&nbsp;
+</BODY>
+</HTML>

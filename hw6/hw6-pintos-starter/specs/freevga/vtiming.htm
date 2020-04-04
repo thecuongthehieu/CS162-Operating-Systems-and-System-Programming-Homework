@@ -1,0 +1,226 @@
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="Author" CONTENT="Joshua Neal">
+   <META NAME="Description" CONTENT="Pure VGA/SVGA hardware programming (registers, identification, and otherlow-level stuff.)">
+   <META NAME="KeyWords" CONTENT="VGA SVGA hardware video programming">
+   <TITLE>FreeVGA - Video Timing Information</TITLE>
+</HEAD>
+<BODY>
+
+<CENTER><A HREF="home.htm">Home</A> <A HREF="#intro">Intro</A> <A HREF="#basics">Basics</A>
+<A HREF="#measure">Measurements</A> <A HREF="#horiz">Horizontal</A> <A HREF="#vert">Vertical</A>
+<A HREF="#considerations">Considerations</A> <A HREF="home.htm#background">Back</A>&nbsp;
+<HR><B>Hardware Level VGA and SVGA Video Programming Information Page</B></CENTER>
+
+<CENTER>Video Timing Information&nbsp;
+<HR></CENTER>
+<A NAME="intro"></A><B>Introduction</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This page is written to give the
+necessary background on video timing that is useful for video programming.&nbsp;
+This is not a comprehensive reference on the subject, rather it just gives
+the minimum information needed to know to perform mode setting and the
+creation of custom video modes.&nbsp; It includes a small bit of information
+about the messy side of video adapters, the electrical output and how that
+is interpreted by the monitor.&nbsp; Much of this information pertains
+both to monitors and other CRT devices such as television displays, and
+is less applicable to LCD displays as they have different timing requirements.
+
+<P><A NAME="basics"></A><B>Basic Description</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The video hardware produces
+a continuous signal on its output connector, except when it is in reset
+mode, where the video outputs are held in a single state.&nbsp; The continuous
+signal is required because the pixel information is only displayed for
+a short period of time, and relies on the persistence of the phosphor glow
+on the monitor as well as the ability of eyesight to perform automatic
+averaging to appear to be a steady image.&nbsp; That signal is usually
+output on multiple pins of the monitor connector, although it could also
+be a TV compatible output.&nbsp; LCD displays use a similar technique,
+although the timing is more advanced and depends on the specific type of
+panel and its driver circuitry.&nbsp; The signal includes both the pixel
+data that the monitor displays, as well as timing and "framing" information
+that the video display uses to drive its internal circuitry.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The image's pixels are "scanned"
+on to the screen from left to right, top to bottom, and is broken up into
+"dot periods" or pixels, which is controlled by the "dot clock" for the
+mode, which is the basis for all the other video timings.&nbsp; Each horizontal
+"scan line" of dot periods is called a horizontal refresh as it "refreshes"
+the information on the display in a horizontal line.&nbsp; Many of these
+scan lines (the amount depending on the video mode), scanning from top
+to bottom, make up a vertical refresh, also known as a "frame".&nbsp; There
+are many vertical refreshes per second, where a higher refresh rate produces
+an image with less flicker.
+
+<P><A NAME="measure"></A><B>Timing Measurements</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; One of the important pieces
+of terminology to understand is how timing is measured.&nbsp; These include
+terms such as megahertz, kilohertz, and hertz.&nbsp; The first three are
+a measure of frequency which is based on the term hertz (abbreviated hz),
+which can be replaced by the term "Cycles per second."&nbsp; In video timing,
+hertz is used to describe the frequencies of the timing signals, such as
+when saying that the vertical refresh frequency is 60 hertz (or 60hz).&nbsp;
+This means that there are 60 cycles per second, which means that there
+are 60 vertical refreshes per second.&nbsp; Another case where hertz is
+used is when saying the horizontal refresh rate, such as when saying 31500
+hz, which means that there are 31,500 horizontal refresh cycles per second.&nbsp;
+One abbreviation frequently found is the term kilohertz (abbreviated Khz)
+which means 1,000 cycles/per second.&nbsp; For example, 31.5 kilohertz
+means 31.5 x 1000 hertz, or 31500 hz.&nbsp; This is used to save writing
+a few zeros and is a bit more concise.&nbsp; Similarly the term megahertz
+(abbreviated Mhz) is used, which means 1,000,000 cycles/per second.&nbsp;
+For example, instead of saying that a certain mode uses a 25,000,000 hz
+dot clock, or saying that it uses a 25,000 Khz clock, it can be concisely
+be stated by saying that it uses a 25 Mhz dot clock.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Similarly, the periods of
+time involved in video timing are very short as they are typically small
+fractions of a second.&nbsp; The terms millisecond, microsecond, and nanosecond
+are useful for expressing these small periods of time.&nbsp; The term millisecond
+(abbreviated ms) means one thousandth of a second, or 0.001 seconds.&nbsp;
+In one second, there are 1,000 milliseconds. This is used to describe things,
+such as the length of time a vertical refresh takes, for example a 16.6
+millisecond vertical refresh means 16.6 thousands of a second, or 0.0166
+seconds.&nbsp; In one second, there are 1,000,000 microseconds.&nbsp; The
+term microsecond (abbreviated us) is used to describe something in terms
+of millionths of a second, or 0.000001 second.&nbsp; For example the length
+of a horizontal refresh could be 31.7 microseconds, or 31.7 millionths
+of a second, 0.0000317 second, or 0.0317 ms.&nbsp; The term nanosecond
+(abbreviated ns) is used to describe one billionth of a second, or 0.000000001
+seconds.&nbsp; There are 1,000,000,000 nanoseconds in one second.&nbsp;
+One circumstance where this is used, is to describe the period of time
+one dot period takes.&nbsp; For example, one dot period could be stated
+as 40 nanoseconds, 0.04 us, 0.00004 ms, or 0.00000004 seconds.&nbsp; In
+each case, the most concise term is used, to provide a shorter, more concise
+description.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Because the unit hertz is
+defined using a unit of time (second), the period of one cycle can be determined
+by division.&nbsp; The simplest example is 1 hz, where the length of the
+cycle, by definition would be 1 second. For other values, it can be calculated
+according to the following formula:
+<UL>
+<LI>
+Period (in seconds) = 1 / frequency (in hertz)</LI>
+</UL>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For example, a 60 hertz vertical
+refresh would last 1 / 60 second, which is approximately 0.0166 seconds,
+or 16.6 ms.&nbsp; Similarly, a 31.5 Khz horizontal refresh would be 1 /
+31500 second, which is approximately 0.000031 seconds, or 31.7 us.&nbsp;
+A 25 Mhz dot clock would produce a dot period of 1 / 25000000 second, which
+is 0.00000004 seconds, or 40 ns.&nbsp; If the period of a cycle is known,
+then the frequency can be calculated as:
+<UL>
+<LI>
+Frequency (in hertz) = 1 / Period (in seconds).</LI>
+</UL>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For example, a 16.6 ms period
+would equate to 1 / 0.0166, which produces a frequency of approximately
+60 hz.&nbsp; Similarly a 31.7 us period would produce approximately a 31.5
+Khz frequency, and a 40 ns period would produce a 25 Mhz frequency.
+
+<P><A NAME="horiz"></A><B>Horizontal Timing</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; From a monitor's standpoint,
+the timing is fairly simple.&nbsp; It detects the horizontal sync pulses
+on the hsync line, then based on the polarity, frequency, and/or duration
+of those pulses sets up its horizontal scan circuitry to scan across the
+screen at the desired rate.&nbsp; During this period it continuously displays
+the signal input on the analog RGB pins/connectors.&nbsp; It is important
+to to know the horizontal sync frequency ranges of the monitor, as well
+as the acceptable width of the sync pulse for those sync ranges.&nbsp;
+If the width of the sync pulse is incorrect, it can make the displayed
+information too large or too small, as well as possibly preventing the
+monitor from synchronizing to the generated signal.&nbsp; The acceptable
+range of sync pulse width and polarity for a given frequency should be
+given in the specifications for the monitor; however, this is frequently
+overlooked by the manufacturer.&nbsp; It is recommended to contact the
+manufacturer, otherwise the result has to be determined by trial and error
+which can be damaging to the monitor's circuitry.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; In addition to those that
+control horizontal sync frequency and width, there are other horizontal
+timing registers which tell the display generation hardware when to output
+the active display, when to output the overscan, and when to perform blanking.&nbsp;
+The active display is when pixel data from the frame buffer are being output
+and displayed.&nbsp; This could also be overlaid by data from another source,
+such as a TV or MPEG decoder, or a hardware cursor.&nbsp; The overscan
+is the border to the left and right of the screen.&nbsp; This was more
+important on older video hardware such as those monitors lacking horizontal
+and vertical picture controls, and is provided for compatibility reasons
+although current hardware typically reduces the need for this portion completely.&nbsp;
+The blanking period is used during the retrace portion of the horizontal
+display cycle which is the period in which the horizontal sweeps from the
+right of the screen back to the left.&nbsp; Outputting non-zero intensities
+during this period would end up being stretched, in reverse across the
+end of the current scan line to the beginning of the next scan line which,
+while interesting and possibly useful in a small number of circumstances.
+would add a bit of blurring to the image.&nbsp; Blanking is signaled to
+the monitor by sending zero intensities of the red, green, and blue components
+on the analog lines.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; In the display generator,&nbsp;
+horizontal timings are specified by the number of dot periods they take.&nbsp;
+The dot period is controlled by selecting the desired dot clock frequency
+by programming certain registers.
+
+<P><A NAME="vert"></A><B>Vertical Timing</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Vertical timing is nearly
+the same as the horizontal timing, except that it controls the vertical
+movement of the display scan, spacing the scan lines the right width apart
+so that they seem to form a rectangular image.&nbsp; The monitor detects
+the vertical sync pulses on the vsync line, then based on the polarity,
+frequency, and/or duration of those pulses sets up its vertical circuitry
+to scan down the screen at the desired rate.&nbsp; It is necessary to know
+the vertical sync frequency ranges for a given monitor, and the range of
+acceptable vertical sync widths and polarities for those ranges.&nbsp;
+The rage of vertical sync frequencies supported by the monitor are nearly
+always given my the monitor's specifications, but like the horizontal sync
+widths, the vertical sync widths are not commonly specified.&nbsp; Contact
+the manufacturer, as attempting to guess the correct vertical sync width
+can possibly cause the monitor to fail.
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; As well as being programmed
+with the vertical sync frequency and pulse width, the display generation
+hardware has other registers which control when to output the active display,
+when to output the overscan, and when to perform blanking. In vertical
+terms, the active display is the scan lines which contain horizontal active
+display periods.&nbsp; The overscan is the border on top and bottom of
+the screen and, if present, consists of one or more entire scan lines in
+which the active display period is replaced with the overscan color.&nbsp;
+The blanking is used during the vertical retrace, and consists of one or
+more (usually more) scan lines in which the active display and overscan
+periods are replaced with blanking period, making the entire line effectively
+blanking.&nbsp; This prevents intensity from overlaying the screen during
+the vertical retrace where the monitor sweeps the vertical back to the
+top of the screen.&nbsp; Non-zero intensities output during this period
+would be written in a zig-zag pattern from the bottom to the top of the
+screen.&nbsp; In the display generator, the vertical timings are specified
+in terms of how many horizontal sync periods they take.
+<BR>&nbsp;
+<BR><A NAME="considerations"></A><B>Programming Considerations</B>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For maximum flexibility,
+video timings should be configurable by the end users to allow for the
+specifications of their monitor.&nbsp; However, it is probably a wise idea
+to maintain a table of monitors and their rated specifications, to allow
+the users to select thieir monitor and determine whether or not the configured
+video timings are within the rated specifications of their monitor and
+warn the user about this.&nbsp; There is a distinct need for a comprehensive
+and accurate software-usable database of monitor specifications in a platform
+and video hardware independent form with sufficient information for a program
+to both select timings for a particular video mode, as well as verify that
+a given set of timings will function properly on the end-user's hardware.&nbsp;
+This database should contain a human readable description of the monitor
+make and model, as well as software parsable fields giving corresponding
+ranges of horizontal and vertical frequencies and sync polarities for those
+ranges if applicable, as well as a method of determining the acceptable
+widths of horizontal and vertical sync pulses for a given frequency in
+the corresponding rages.&nbsp; Framing information could be included in
+this table in a frequency independent fashion, although this is something
+that can be safely adjusted by the end user without risk of damage to the
+monitor, thus it is preferrable to provide a method or interface for the
+end-user to adjust these parameters to their preference.
+<BR>&nbsp;
+
+<P>Notice: All trademarks used or referred to on this page are the property
+of their respective owners.
+<BR>All pages are Copyright &copy; 1997, 1998, J. D. Neal, except where
+noted. Permission for utilization and distribution is subject to the terms
+of the <A HREF="license.htm">FreeVGA Project Copyright License</A>.
+<BR>&nbsp;
+<BR>&nbsp;
+</BODY>
+</HTML>
