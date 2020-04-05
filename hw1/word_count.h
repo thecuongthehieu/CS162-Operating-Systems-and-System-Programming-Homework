@@ -36,7 +36,7 @@
  * PINTOS_LIST and/or PTHREADS are #define'd prior to #include to select the
  * representations.
  */
-
+//#define PINTOS_LIST
 #ifdef PINTOS_LIST
 #include "list.h"
 typedef struct word_count {
