@@ -7,10 +7,10 @@
 #include "tests/main.h"
 
 void
-test_main (void) 
+test_main (void)
 {
   int h1 = open ("sample.txt");
-  int h2 = open ("sample.txt");  
+  int h2 = open ("sample.txt");
 
   CHECK ((h1 = open ("sample.txt")) > 1, "open \"sample.txt\" once");
   CHECK ((h2 = open ("sample.txt")) > 1, "open \"sample.txt\" again");

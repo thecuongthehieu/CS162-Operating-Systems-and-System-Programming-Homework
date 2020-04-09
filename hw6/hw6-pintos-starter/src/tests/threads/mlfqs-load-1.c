@@ -15,18 +15,18 @@
 #include "devices/timer.h"
 
 void
-test_mlfqs_load_1 (void) 
+test_mlfqs_load_1 (void)
 {
   int64_t start_time;
   int elapsed;
   int load_avg;
-  
+
   ASSERT (thread_mlfqs);
 
   msg ("spinning for up to 45 seconds, please wait...");
 
   start_time = timer_ticks ();
-  for (;;) 
+  for (;;)
     {
       load_avg = thread_get_load_avg ();
       ASSERT (load_avg >= 0);

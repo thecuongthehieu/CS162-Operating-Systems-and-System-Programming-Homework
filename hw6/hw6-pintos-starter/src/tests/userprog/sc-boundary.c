@@ -7,7 +7,7 @@
 #include "tests/main.h"
 
 void
-test_main (void) 
+test_main (void)
 {
   /* Put a syscall number at the end of one page
      and its argument at the beginning of another. */

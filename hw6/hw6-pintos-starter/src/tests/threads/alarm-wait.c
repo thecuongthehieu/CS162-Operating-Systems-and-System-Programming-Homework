@@ -13,19 +13,19 @@
 static void test_sleep (int thread_cnt, int iterations);
 
 void
-test_alarm_single (void) 
+test_alarm_single (void)
 {
   test_sleep (5, 1);
 }
 
 void
-test_alarm_multiple (void) 
+test_alarm_multiple (void)
 {
   test_sleep (5, 7);
 }
 
 /* Information about the test. */
-struct sleep_test 
+struct sleep_test
   {
     int64_t start;              /* Current time at start of test. */
     int iterations;             /* Number of iterations per thread. */
@@ -36,7 +36,7 @@ struct sleep_test
   };
 
 /* Information about an individual thread in the test. */
-struct sleep_thread 
+struct sleep_thread
   {
     struct sleep_test *test;     /* Info shared between all threads. */
     int id;                     /* Sleeper ID. */
@@ -48,7 +48,7 @@ static void sleeper (void *);
 
 /* Runs THREAD_CNT threads thread sleep ITERATIONS times each. */
 static void
-test_sleep (int thread_cnt, int iterations) 
+test_sleep (int thread_cnt, int iterations)
 {
   struct sleep_test test;
   struct sleep_thread *threads;
@@ -83,7 +83,7 @@ test_sleep (int thread_cnt, int iterations)
     {
       struct sleep_thread *t = threads + i;
       char name[16];
-      
+
       t->test = &test;
       t->id = i;
       t->duration = (i + 1) * 10;
@@ -92,7 +92,7 @@ test_sleep (int thread_cnt, int iterations)
       snprintf (name, sizeof name, "thread %d", i);
       thread_create (name, PRI_DEFAULT, sleeper, t);
     }
-  
+
   /* Wait long enough for all the threads to finish. */
   timer_sleep (100 + thread_cnt * iterations * 10 + 100);
 
@@ -102,7 +102,7 @@ test_sleep (int thread_cnt, int iterations)
 
   /* Print completion order. */
   product = 0;
-  for (op = output; op < test.output_pos; op++) 
+  for (op = output; op < test.output_pos; op++)
     {
       struct sleep_thread *t;
       int new_prod;
@@ -111,10 +111,10 @@ test_sleep (int thread_cnt, int iterations)
       t = threads + *op;
 
       new_prod = ++t->iterations * t->duration;
-        
+
       msg ("thread %d: duration=%d, iteration=%d, product=%d",
            t->id, t->duration, t->iterations, new_prod);
-      
+
       if (new_prod >= product)
         product = new_prod;
       else
@@ -127,7 +127,7 @@ test_sleep (int thread_cnt, int iterations)
     if (threads[i].iterations != iterations)
       fail ("thread %d woke up %d times instead of %d",
             i, threads[i].iterations, iterations);
-  
+
   lock_release (&test.output_lock);
   free (output);
   free (threads);
@@ -135,13 +135,13 @@ test_sleep (int thread_cnt, int iterations)
 
 /* Sleeper thread. */
 static void
-sleeper (void *t_) 
+sleeper (void *t_)
 {
   struct sleep_thread *t = t_;
   struct sleep_test *test = t->test;
   int i;
 
-  for (i = 1; i <= test->iterations; i++) 
+  for (i = 1; i <= test->iterations; i++)
     {
       int64_t sleep_until = test->start + i * t->duration;
       timer_sleep (sleep_until - timer_ticks ());

@@ -25,7 +25,7 @@ endif
 TIMEOUT = 60
 
 clean::
-	rm -f $(OUTPUTS) $(ERRORS) $(RESULTS) 
+	rm -f $(OUTPUTS) $(ERRORS) $(RESULTS)
 
 grade:: results
 	$(SRCDIR)/tests/make-grade $(SRCDIR) $< $(GRADING_FILE) | tee $@

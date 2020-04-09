@@ -4,7 +4,7 @@
 #include "tests/main.h"
 
 void
-test_main (void) 
+test_main (void)
 {
   wait (exec ("child-args childarg"));
 }

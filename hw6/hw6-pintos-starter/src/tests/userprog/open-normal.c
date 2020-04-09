@@ -5,7 +5,7 @@
 #include "tests/main.h"
 
 void
-test_main (void) 
+test_main (void)
 {
   int handle = open ("sample.txt");
   if (handle < 2)

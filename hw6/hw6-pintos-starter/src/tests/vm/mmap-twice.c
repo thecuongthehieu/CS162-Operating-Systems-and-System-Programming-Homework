@@ -14,7 +14,7 @@ test_main (void)
   size_t i;
   int handle[2];
 
-  for (i = 0; i < 2; i++) 
+  for (i = 0; i < 2; i++)
     {
       CHECK ((handle[i] = open ("sample.txt")) > 1,
              "open \"sample.txt\" #%zu", i);

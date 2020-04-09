@@ -3,21 +3,21 @@
 tests/%.output: FILESYSSOURCE = --filesys-size=2
 tests/%.output: PUTFILES = $(filter-out kernel.bin loader.bin, $^)
 
-tests/userprog_TESTS = $(addprefix tests/userprog/,args-none            \
-args-single args-multiple args-many args-dbl-space sc-bad-sp            \
-sc-bad-arg sc-boundary sc-boundary-2 sc-boundary-3 halt exit            \
-create-normal create-empty create-null create-bad-ptr create-long       \
-create-exists create-bound open-normal open-missing open-boundary       \
-open-empty open-null open-bad-ptr open-twice close-normal               \
-close-twice close-stdin close-stdout close-bad-fd read-normal           \
-read-bad-ptr read-boundary read-zero read-stdout read-bad-fd            \
-write-normal write-bad-ptr write-boundary write-zero write-stdin        \
-write-bad-fd exec-once exec-arg exec-bound exec-bound-2                 \
-exec-bound-3 exec-multiple exec-missing exec-bad-ptr wait-simple        \
-wait-twice wait-killed wait-bad-pid multi-recurse multi-child-fd        \
-rox-simple rox-child rox-multichild bad-read bad-write bad-read2        \
-bad-write2 bad-jump bad-jump2 iloveos practice do-nothing               \
-stack-align-1 stack-align-2 stack-align-3 stack-align-4)
+tests/userprog_TESTS = $(addprefix tests/userprog/,do-nothing           \
+do-stack-align args-none args-single args-multiple args-many            \
+args-dbl-space sc-bad-sp sc-bad-arg sc-boundary sc-boundary-2           \
+sc-boundary-3 halt exit create-normal create-empty create-null          \
+create-bad-ptr create-long create-exists create-bound open-normal       \
+open-missing open-boundary open-empty open-null open-bad-ptr            \
+open-twice close-normal close-twice close-stdin close-stdout            \
+close-bad-fd read-normal read-bad-ptr read-boundary read-zero           \
+read-stdout read-bad-fd write-normal write-bad-ptr write-boundary       \
+write-zero write-stdin write-bad-fd exec-once exec-arg exec-bound       \
+exec-bound-2 exec-bound-3 exec-multiple exec-missing exec-bad-ptr       \
+wait-simple wait-twice wait-killed wait-bad-pid multi-recurse           \
+multi-child-fd rox-simple rox-child rox-multichild bad-read bad-write   \
+bad-read2 bad-write2 bad-jump bad-jump2 iloveos practice stack-align-1  \
+stack-align-2 stack-align-3 stack-align-4)
 
 tests/userprog_PROGS = $(tests/userprog_TESTS) $(addprefix \
 tests/userprog/,child-simple child-args child-bad child-close child-rox)
@@ -25,6 +25,7 @@ tests/userprog/,child-simple child-args child-bad child-close child-rox)
 tests/userprog/iloveos_SRC = tests/userprog/iloveos.c tests/main.c
 tests/userprog/practice_SRC = tests/userprog/practice.c tests/main.c
 tests/userprog/do-nothing_SRC = tests/userprog/do-nothing.c
+tests/userprog/do-stack-align_SRC = tests/userprog/do-stack-align.c
 tests/userprog/stack-align-1_SRC = tests/userprog/stack-align.c
 tests/userprog/stack-align-2_SRC = tests/userprog/stack-align.c
 tests/userprog/stack-align-3_SRC = tests/userprog/stack-align.c
