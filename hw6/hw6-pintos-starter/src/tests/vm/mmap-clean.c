@@ -41,12 +41,12 @@ test_main (void)
   /* Verify that file overwrite worked. */
   if (memcmp (buffer, overwrite, strlen (overwrite))
       || memcmp (buffer + strlen (overwrite), sample + strlen (overwrite),
-                 strlen (sample) - strlen (overwrite))) 
+                 strlen (sample) - strlen (overwrite)))
     {
       if (!memcmp (buffer, sample, strlen (sample)))
         fail ("munmap wrote back clean page");
       else
-        fail ("read surprising data from file"); 
+        fail ("read surprising data from file");
     }
   else
     msg ("file change was retained after munmap");

@@ -16,7 +16,7 @@
 const char *test_name = "child-close";
 
 int
-main (int argc UNUSED, char *argv[]) 
+main (int argc UNUSED, char *argv[])
 {
   msg ("begin");
   if (!isdigit (*argv[1]))

@@ -14,10 +14,10 @@ static struct lock lock;
 static struct condition condition;
 
 void
-test_priority_condvar (void) 
+test_priority_condvar (void)
 {
   int i;
-  
+
   /* This test does not work with the MLFQS. */
   ASSERT (!thread_mlfqs);
 
@@ -25,7 +25,7 @@ test_priority_condvar (void)
   cond_init (&condition);
 
   thread_set_priority (PRI_MIN);
-  for (i = 0; i < 10; i++) 
+  for (i = 0; i < 10; i++)
     {
       int priority = PRI_DEFAULT - (i + 7) % 10 - 1;
       char name[16];
@@ -33,7 +33,7 @@ test_priority_condvar (void)
       thread_create (name, priority, priority_condvar_thread, NULL);
     }
 
-  for (i = 0; i < 10; i++) 
+  for (i = 0; i < 10; i++)
     {
       lock_acquire (&lock);
       msg ("Signaling...");
@@ -43,7 +43,7 @@ test_priority_condvar (void)
 }
 
 static void
-priority_condvar_thread (void *aux UNUSED) 
+priority_condvar_thread (void *aux UNUSED)
 {
   msg ("Thread %s starting.", thread_name ());
   lock_acquire (&lock);

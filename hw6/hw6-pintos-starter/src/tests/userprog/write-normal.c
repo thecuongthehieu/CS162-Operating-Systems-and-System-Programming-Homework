@@ -6,7 +6,7 @@
 #include "tests/main.h"
 
 void
-test_main (void) 
+test_main (void)
 {
   int handle, byte_cnt;
 

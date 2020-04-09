@@ -15,7 +15,7 @@ static char dst[8192] __attribute__ ((section (".testEndmem,\"aw\",@nobits#")));
 /* Returns the beginning of a page.  There are at least 2048
    modifiable bytes on either side of the pointer returned. */
 void *
-get_boundary_area (void) 
+get_boundary_area (void)
 {
   char *p = (char *) ROUND_UP ((uintptr_t) dst, 4096);
   if (p - dst < 2048)
@@ -26,7 +26,7 @@ get_boundary_area (void)
 /* Returns a copy of SRC split across the boundary between two
    pages. */
 char *
-copy_string_across_boundary (const char *src) 
+copy_string_across_boundary (const char *src)
 {
   char *p = get_boundary_area ();
   p -= strlen (src) < 4096 ? strlen (src) / 2 : 4096;

@@ -1,4 +1,4 @@
-/* The main thread set its priority to PRI_MIN and creates 7 threads 
+/* The main thread set its priority to PRI_MIN and creates 7 threads
    (thread 1..7) with priorities PRI_MIN + 3, 6, 9, 12, ...
    The main thread initializes 8 locks: lock 0..7 and acquires lock 0.
 
@@ -14,15 +14,15 @@
    preempted by it.
    Thread[1] then completes acquiring lock[0], then releases lock[0],
    then releases lock[1], unblocking thread[2], etc.
-   Thread[7] finally acquires & releases lock[7] and exits, allowing 
-   thread[6], then thread[5] etc. to run and exit until finally the 
+   Thread[7] finally acquires & releases lock[7] and exits, allowing
+   thread[6], then thread[5] etc. to run and exit until finally the
    main thread exits.
 
    In addition, interloper threads are created at priority levels
-   p = PRI_MIN + 2, 5, 8, 11, ... which should not be run until the 
+   p = PRI_MIN + 2, 5, 8, 11, ... which should not be run until the
    corresponding thread with priority p + 1 has finished.
-  
-   Written by Godmar Back <gback@cs.vt.edu> */ 
+
+   Written by Godmar Back <gback@cs.vt.edu> */
 
 #include <stdio.h>
 #include "tests/threads/tests.h"
@@ -42,9 +42,9 @@ static thread_func donor_thread_func;
 static thread_func interloper_thread_func;
 
 void
-test_priority_donate_chain (void) 
+test_priority_donate_chain (void)
 {
-  int i;  
+  int i;
   struct lock locks[NESTING_DEPTH - 1];
   struct lock_pair lock_pairs[NESTING_DEPTH];
 
@@ -83,7 +83,7 @@ test_priority_donate_chain (void)
 }
 
 static void
-donor_thread_func (void *locks_) 
+donor_thread_func (void *locks_)
 {
   struct lock_pair *locks = locks_;
 
@@ -94,7 +94,7 @@ donor_thread_func (void *locks_)
   msg ("%s got lock", thread_name ());
 
   lock_release (locks->second);
-  msg ("%s should have priority %d. Actual priority: %d", 
+  msg ("%s should have priority %d. Actual priority: %d",
         thread_name (), (NESTING_DEPTH - 1) * 3,
         thread_get_priority ());
 

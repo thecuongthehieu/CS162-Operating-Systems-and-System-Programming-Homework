@@ -82,7 +82,7 @@ cksum (const void *b_, size_t n)
 #ifdef STANDALONE_TEST
 #include <stdio.h>
 int
-main (void) 
+main (void)
 {
   char buf[65536];
   int n = fread (buf, 1, sizeof buf, stdin);

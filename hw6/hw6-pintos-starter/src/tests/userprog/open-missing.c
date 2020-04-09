@@ -5,7 +5,7 @@
 #include "tests/main.h"
 
 void
-test_main (void) 
+test_main (void)
 {
   int handle = open ("no-such-file");
   if (handle != -1)

@@ -8,7 +8,7 @@
 #include "tests/main.h"
 
 void
-test_main (void) 
+test_main (void)
 {
   /* Make one byte of a syscall argument hang over into a second
      page. */
