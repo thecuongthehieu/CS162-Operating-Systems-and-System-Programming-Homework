@@ -9,7 +9,7 @@
 #include "tests/main.h"
 
 void
-test_main (void) 
+test_main (void)
 {
   asm volatile ("movl $0xbffffffc, %%esp; movl %0, (%%esp); int $0x30"
                 : : "i" (SYS_EXIT));

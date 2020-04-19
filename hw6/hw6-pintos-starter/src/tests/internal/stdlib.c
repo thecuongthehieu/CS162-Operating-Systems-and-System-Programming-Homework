@@ -25,7 +25,7 @@ static void verify_bsearch (const int[], size_t);
 
 /* Test sorting and searching implementations. */
 void
-test (void) 
+test (void)
 {
   int cnt;
 
@@ -35,7 +35,7 @@ test (void)
       int repeat;
 
       printf (" %zu", cnt);
-      for (repeat = 0; repeat < 10; repeat++) 
+      for (repeat = 0; repeat < 10; repeat++)
         {
           static int values[MAX_CNT];
           int i;
@@ -44,21 +44,21 @@ test (void)
           for (i = 0; i < cnt; i++)
             values[i] = i;
           shuffle (values, cnt);
-  
+
           /* Sort VALUES, then verify ordering. */
           qsort (values, cnt, sizeof *values, compare_ints);
           verify_order (values, cnt);
           verify_bsearch (values, cnt);
         }
     }
-  
+
   printf (" done\n");
   printf ("stdlib: PASS\n");
 }
 
 /* Shuffles the CNT elements in ARRAY into random order. */
 static void
-shuffle (int *array, size_t cnt) 
+shuffle (int *array, size_t cnt)
 {
   size_t i;
 
@@ -75,7 +75,7 @@ shuffle (int *array, size_t cnt)
    0 if *A equals *B,
    -1 if *A is less than *B. */
 static int
-compare_ints (const void *a_, const void *b_) 
+compare_ints (const void *a_, const void *b_)
 {
   const int *a = a_;
   const int *b = b_;
@@ -85,30 +85,30 @@ compare_ints (const void *a_, const void *b_)
 
 /* Verifies that ARRAY contains the CNT ints 0...CNT-1. */
 static void
-verify_order (const int *array, size_t cnt) 
+verify_order (const int *array, size_t cnt)
 {
   int i;
 
-  for (i = 0; (size_t) i < cnt; i++) 
+  for (i = 0; (size_t) i < cnt; i++)
     ASSERT (array[i] == i);
 }
 
 /* Checks that bsearch() works properly in ARRAY.  ARRAY must
    contain the values 0...CNT-1. */
 static void
-verify_bsearch (const int *array, size_t cnt) 
+verify_bsearch (const int *array, size_t cnt)
 {
   int not_in_array[] = {0, -1, INT_MAX, MAX_CNT, MAX_CNT + 1, MAX_CNT * 2};
   int i;
 
   /* Check that all the values in the array are found properly. */
-  for (i = 0; (size_t) i < cnt; i++) 
+  for (i = 0; (size_t) i < cnt; i++)
     ASSERT (bsearch (&i, array, cnt, sizeof *array, compare_ints)
             == array + i);
 
   /* Check that some values not in the array are not found. */
   not_in_array[0] = cnt;
-  for (i = 0; (size_t) i < sizeof not_in_array / sizeof *not_in_array; i++) 
+  for (i = 0; (size_t) i < sizeof not_in_array / sizeof *not_in_array; i++)
     ASSERT (bsearch (&not_in_array[i], array, cnt, sizeof *array, compare_ints)
             == NULL);
 }

@@ -5,7 +5,7 @@
 #include "tests/main.h"
 
 void
-test_main (void) 
+test_main (void)
 {
   CHECK (mkdir ("a"), "mkdir \"a\"");
   CHECK (create ("a/b", 512), "create \"a/b\"");

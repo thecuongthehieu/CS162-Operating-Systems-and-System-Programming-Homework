@@ -10,7 +10,7 @@
 static thread_func changing_thread;
 
 void
-test_priority_change (void) 
+test_priority_change (void)
 {
   /* This test does not work with the MLFQS. */
   ASSERT (!thread_mlfqs);
@@ -23,7 +23,7 @@ test_priority_change (void)
 }
 
 static void
-changing_thread (void *aux UNUSED) 
+changing_thread (void *aux UNUSED)
 {
   msg ("Thread 2 now lowering priority.");
   thread_set_priority (PRI_DEFAULT - 1);

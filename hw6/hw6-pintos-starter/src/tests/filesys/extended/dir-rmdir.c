@@ -6,7 +6,7 @@
 #include "tests/main.h"
 
 void
-test_main (void) 
+test_main (void)
 {
   CHECK (mkdir ("a"), "mkdir \"a\"");
   CHECK (remove ("a"), "rmdir \"a\"");

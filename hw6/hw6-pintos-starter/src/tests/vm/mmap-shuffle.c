@@ -28,7 +28,7 @@ test_main (void)
   for (i = 0; i < SIZE; i++)
     buf[i] = i * 257;
   msg ("init: cksum=%lu", cksum (buf, SIZE));
-    
+
   /* Shuffle repeatedly. */
   for (i = 0; i < 10; i++)
     {

@@ -9,7 +9,7 @@
 #include "tests/main.h"
 
 void
-test_main (void) 
+test_main (void)
 {
   int handle;
   int byte_cnt;
@@ -21,7 +21,7 @@ test_main (void)
   byte_cnt = read (handle, buffer, sizeof sample - 1);
   if (byte_cnt != sizeof sample - 1)
     fail ("read() returned %d instead of %zu", byte_cnt, sizeof sample - 1);
-  else if (strcmp (sample, buffer)) 
+  else if (strcmp (sample, buffer))
     {
       msg ("expected text:\n%s", sample);
       msg ("text actually read:\n%s", buffer);

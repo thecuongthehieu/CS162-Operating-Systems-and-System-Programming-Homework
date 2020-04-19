@@ -39,7 +39,7 @@ char *str_from_virt(vaddr_ptr vaddr, paddr_ptr cr3) {
   char c = ' ';
   paddr_ptr paddr;
 
-  for (int i; c; i++) {
+  for (int i=0; c; i++) {
     if(virt_to_phys(vaddr + i, cr3, &paddr)){
       printf("Page fault occured at address %p\n", (void *) vaddr + i);
       return (void *) 0;

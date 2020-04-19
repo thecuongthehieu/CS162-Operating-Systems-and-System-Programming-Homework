@@ -19,7 +19,7 @@
 #define MAX_SIZE 64
 
 /* A linked list element. */
-struct value 
+struct value
   {
     struct list_elem elem;      /* List element. */
     int value;                  /* Item value. */
@@ -33,17 +33,17 @@ static void verify_list_bkwd (struct list *, int size);
 
 /* Test the linked list implementation. */
 void
-test (void) 
+test (void)
 {
   int size;
 
   printf ("testing various size lists:");
-  for (size = 0; size < MAX_SIZE; size++) 
+  for (size = 0; size < MAX_SIZE; size++)
     {
       int repeat;
 
       printf (" %d", size);
-      for (repeat = 0; repeat < 10; repeat++) 
+      for (repeat = 0; repeat < 10; repeat++)
         {
           static struct value values[MAX_SIZE * 4];
           struct list list;
@@ -54,7 +54,7 @@ test (void)
           for (i = 0; i < size; i++)
             values[i].value = i;
           shuffle (values, size);
-  
+
           /* Assemble list. */
           list_init (&list);
           for (i = 0; i < size; i++)
@@ -92,7 +92,7 @@ test (void)
             {
               struct value *v = list_entry (e, struct value, elem);
               int copies = random_ulong () % 4;
-              while (copies-- > 0) 
+              while (copies-- > 0)
                 {
                   values[ofs].value = v->value;
                   list_insert (e, &values[ofs++].elem);
@@ -103,14 +103,14 @@ test (void)
           verify_list_fwd (&list, size);
         }
     }
-  
+
   printf (" done\n");
   printf ("list: PASS\n");
 }
 
 /* Shuffles the CNT elements in ARRAY into random order. */
 static void
-shuffle (struct value *array, size_t cnt) 
+shuffle (struct value *array, size_t cnt)
 {
   size_t i;
 
@@ -127,25 +127,25 @@ shuffle (struct value *array, size_t cnt)
    otherwise. */
 static bool
 value_less (const struct list_elem *a_, const struct list_elem *b_,
-            void *aux UNUSED) 
+            void *aux UNUSED)
 {
   const struct value *a = list_entry (a_, struct value, elem);
   const struct value *b = list_entry (b_, struct value, elem);
-  
+
   return a->value < b->value;
 }
 
 /* Verifies that LIST contains the values 0...SIZE when traversed
    in forward order. */
 static void
-verify_list_fwd (struct list *list, int size) 
+verify_list_fwd (struct list *list, int size)
 {
   struct list_elem *e;
   int i;
-  
+
   for (i = 0, e = list_begin (list);
        i < size && e != list_end (list);
-       i++, e = list_next (e)) 
+       i++, e = list_next (e))
     {
       struct value *v = list_entry (e, struct value, elem);
       ASSERT (i == v->value);
@@ -157,14 +157,14 @@ verify_list_fwd (struct list *list, int size)
 /* Verifies that LIST contains the values 0...SIZE when traversed
    in reverse order. */
 static void
-verify_list_bkwd (struct list *list, int size) 
+verify_list_bkwd (struct list *list, int size)
 {
   struct list_elem *e;
   int i;
 
   for (i = 0, e = list_rbegin (list);
        i < size && e != list_rend (list);
-       i++, e = list_prev (e)) 
+       i++, e = list_prev (e))
     {
       struct value *v = list_entry (e, struct value, elem);
       ASSERT (i == v->value);

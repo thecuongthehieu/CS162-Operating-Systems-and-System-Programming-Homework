@@ -21,7 +21,7 @@ size_t histogram[256];
 /* Initialize buf1 with random data,
    then count the number of instances of each value within it. */
 static void
-init (void) 
+init (void)
 {
   struct arc4 arc4;
   size_t i;
@@ -41,7 +41,7 @@ sort_chunks (void)
   size_t i;
 
   create ("buffer", CHUNK_SIZE);
-  for (i = 0; i < CHUNK_CNT; i++) 
+  for (i = 0; i < CHUNK_CNT; i++)
     {
       pid_t child;
       int handle;
@@ -70,7 +70,7 @@ sort_chunks (void)
 
 /* Merge the sorted chunks in buf1 into a fully sorted buf2. */
 static void
-merge (void) 
+merge (void)
 {
   unsigned char *mp[CHUNK_CNT];
   size_t mp_left;
@@ -86,7 +86,7 @@ merge (void)
 
   /* Merge. */
   op = buf2;
-  while (mp_left > 0) 
+  while (mp_left > 0)
     {
       /* Find smallest value. */
       size_t min = 0;
@@ -98,14 +98,14 @@ merge (void)
       *op++ = *mp[min];
 
       /* Advance merge pointer.
-         Delete this chunk from the set if it's emptied. */ 
+         Delete this chunk from the set if it's emptied. */
       if ((++mp[min] - buf1) % CHUNK_SIZE == 0)
-        mp[min] = mp[--mp_left]; 
+        mp[min] = mp[--mp_left];
     }
 }
 
 static void
-verify (void) 
+verify (void)
 {
   size_t buf_idx;
   size_t hist_idx;
@@ -116,12 +116,12 @@ verify (void)
   for (hist_idx = 0; hist_idx < sizeof histogram / sizeof *histogram;
        hist_idx++)
     {
-      while (histogram[hist_idx]-- > 0) 
+      while (histogram[hist_idx]-- > 0)
         {
           if (buf2[buf_idx] != hist_idx)
             fail ("bad value %d in byte %zu", buf2[buf_idx], buf_idx);
           buf_idx++;
-        } 
+        }
     }
 
   msg ("success, buf_idx=%'zu", buf_idx);
