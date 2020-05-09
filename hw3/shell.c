@@ -30,6 +30,8 @@ pid_t shell_pgid;
 
 int cmd_exit(struct tokens *tokens);
 int cmd_help(struct tokens *tokens);
+int cmd_pwd(struct tokens *tokens);
+int cmd_cd(struct tokens *tokens);
 
 /* Built-in command functions take token array (see parse.h) and return int */
 typedef int cmd_fun_t(struct tokens *tokens);
@@ -44,6 +46,8 @@ typedef struct fun_desc {
 fun_desc_t cmd_table[] = {
   {cmd_help, "?", "show this help menu"},
   {cmd_exit, "exit", "exit the command shell"},
+  {cmd_pwd, "pwd", "print current working directory"},
+  {cmd_cd, "cd", "change directory"},
 };
 
 /* Prints a helpful description for the given command */
@@ -56,6 +60,23 @@ int cmd_help(unused struct tokens *tokens) {
 /* Exits this shell */
 int cmd_exit(unused struct tokens *tokens) {
   exit(0);
+}
+
+/* Print current working directory*/
+int cmd_pwd(unused struct tokens *tokens) {
+  int MAX_PATHLEN = 100;
+ 
+  char *buf = (char *) malloc(MAX_PATHLEN);
+  getcwd(buf, MAX_PATHLEN);
+  printf("%s\n", buf);
+  return 1;
+}
+
+/* */
+int cmd_cd(struct tokens *token) {
+  char *new_dir = tokens_get_token(token, 1);
+  
+  return chdir(new_dir);
 }
 
 /* Looks up the built-in command, if it exists. */
@@ -92,8 +113,20 @@ void init_shell() {
   }
 }
 
+
+void sigint_handler(int sig)
+{
+  char c;
+  printf("\nOuch, you just hit Ctrl-C?. Do you really want to quit [y/n]?");
+  c = getchar();
+  if (c == 'y' || c == 'Y')
+    exit(0);
+}
+
 int main(unused int argc, unused char *argv[]) {
   init_shell();
+
+  signal(SIGINT, sigint_handler);
 
   static char line[4096];
   int line_num = 0;
@@ -113,7 +146,23 @@ int main(unused int argc, unused char *argv[]) {
       cmd_table[fundex].fun(tokens);
     } else {
       /* REPLACE this to run commands as programs. */
-      fprintf(stdout, "This shell doesn't know how to run programs.\n");
+      
+      //fprintf(stdout, "This shell doesn't know how to run programs.\n");
+      int status;
+      pid_t pid = fork(); 
+      if (pid > 0) {
+        wait(&status);
+      } else {
+        char **arg = (char **) malloc(tokens_get_length(tokens));
+        for (int i = 0; i < tokens_get_length(tokens); ++i) {
+          arg[i] = (char *) malloc(100);
+          strcpy(arg[i], tokens_get_token(tokens, i));
+        }
+
+        execv(tokens_get_token(tokens, 0), arg);
+        //execv(tokens_get_token(tokens, 0), arg); // be ignored
+      }
+
     }
 
     if (shell_is_interactive)
