@@ -31,6 +31,58 @@ char *server_files_directory;
 char *server_proxy_hostname;
 int server_proxy_port;
 
+
+int max_file_size = 100;
+
+
+/* Helper function */
+
+/* Get a the size of the file specified by file descriptor fd */
+int get_file_size(int fd) {
+    int saved_pos = lseek(fd, 0, SEEK_CUR);
+    off_t file_size = lseek(fd, 0, SEEK_END);
+    lseek(fd, saved_pos, SEEK_SET);
+    return file_size;
+}
+
+int http_send_file(int dst_fd, int src_fd) {
+    const int buf_size = 4096;
+    char buf[buf_size];
+    ssize_t bytes_read;
+    int status;
+    while( (bytes_read=read(src_fd, buf, buf_size))!=0) {
+        status = http_send_data(dst_fd, buf, bytes_read);
+        if(status < 0) return status;
+    }
+    return 0;
+}
+
+int http_send_string(int fd, char *data) {
+    return http_send_data(fd, data, strlen(data));
+}
+
+int http_send_data(int fd, char *data, size_t size) {
+    ssize_t bytes_sent;
+    while (size > 0) {
+        bytes_sent = write(fd, data, size);
+        if (bytes_sent < 0)
+            return bytes_sent;
+        size -= bytes_sent;
+        data += bytes_sent;
+    }
+    return 0;
+}
+
+char* join_string(char *str1, char *str2, size_t *size) {
+    char *ret = (char *) malloc(strlen(str1) + strlen(str2) + 1), *p = ret;
+    for(; (*p=*str1); p++, str1++);
+    for(; (*p=*str2); p++, str2++);
+    if(size != NULL) *size = (p-ret)*sizeof(char);
+    return ret;
+}
+
+
+
 /*
  * Serves the contents the file stored at `path` to the client socket `fd`.
  * It is the caller's reponsibility to ensure that the file stored at `path` exists.
@@ -39,11 +91,18 @@ void serve_file(int fd, char *path) {
 
   http_start_response(fd, 200);
   http_send_header(fd, "Content-Type", http_get_mime_type(path));
-  http_send_header(fd, "Content-Length", "0"); // Change this too
+
+  int src_fd = open(path,O_RDONLY);
+  char *file_size = (char *) malloc(max_file_size * sizeof(char));
+  sprintf(file_size, "%d", get_file_size(src_fd));  
+  http_send_header(fd, "Content-Length", file_size); // Change this too
+
   http_end_headers(fd);
 
   /* TODO: PART 2 */
-
+  http_send_file(fd, src_fd);
+  close(src_fd);
+  return;
 }
 
 void serve_directory(int fd, char *path) {
@@ -52,9 +111,63 @@ void serve_directory(int fd, char *path) {
   http_end_headers(fd);
 
   /* TODO: PART 3 */
+  int index_is_exist = 0;
+  DIR *dirp;
+  struct dirent *dp;
+  dirp = opendir(path);
+  while ((dp = readdir(dirp)) != NULL) { // check if this directory has index.html
+    if (strcmp(dp->d_name, "index.html") == 0) {
+      int length = strlen(path) + strlen("/index.html") + 1;
+      char* full_path = (char* ) malloc(length * sizeof(char));
+      http_format_index(full_path, path);
 
+      // send index.html file
+      int src_fd = open(full_path,O_RDONLY);
+      http_send_file(fd, src_fd);
+
+      close(src_fd);
+
+      index_is_exist = 1;
+      break;
+    }
+  }
+
+  if (index_is_exist) {
+    closedir(dirp);
+    return;
+  }
+
+
+  char* send_buffer = (char *)malloc(1);
+  send_buffer[0] = '\0';
+  dirp = opendir(path);
+
+  while ((dp = readdir(dirp)) != NULL) {
+    char *dir_name = dp->d_name;
+    char *file_name_buffer;
+
+    if (strcmp(dir_name, "..") == 0) {
+      int length = strlen("<a href=\"//\"></a><br/>") + strlen("..") + strlen("")*2 + 1;
+      file_name_buffer = (char* ) malloc(length * sizeof(char));
+      http_format_href(file_name_buffer, "..", dir_name);
+
+    } else {
+      int length = strlen("<a href=\"//\"></a><br/>") + strlen(path) + strlen(dir_name)*2 + 1;
+      file_name_buffer = (char* ) malloc(length * sizeof(char));
+      http_format_href(file_name_buffer, path, dir_name);
+    }
+
+    send_buffer = join_string(send_buffer, file_name_buffer, NULL);
+    free(file_name_buffer);
+  }
+
+  size_t content_len;
+  send_buffer = join_string(send_buffer,  "</center></body></html>", &content_len);
+
+  http_send_string(fd, send_buffer);
+
+  closedir(dirp); 
 }
-
 
 /*
  * Reads an HTTP request from client socket (fd), and writes an HTTP response
@@ -105,9 +218,64 @@ void handle_files_request(int fd) {
    * on `path`. Make your edits below here in this function.
    */
 
+  struct stat sb;
+  int exist = stat(path, &sb);
+
+  if (exist == 0) { // check if path is exist
+    if (S_ISDIR(sb.st_mode)) { // check if path is directory
+      serve_directory(fd, path);
+    } else {
+      serve_file(fd, path);
+    }
+
+  } else {
+    http_start_response(fd, 404);
+    http_send_header(fd, "Content-Type", "text/html");
+    http_end_headers(fd);
+  }
+
+
   close(fd);
   return;
 }
+
+
+/* Helper function for Proxy handler */
+
+struct fd_pair {
+    int *read_fd;
+    int *write_fd;
+    pthread_cond_t* cond;
+    int *finished;
+    char* type;
+    unsigned long id;
+};
+
+void* relay_message(void* endpoints) {
+    struct fd_pair* pair = (struct fd_pair*)endpoints;   
+    
+    char buffer[4096];
+    int read_ret, write_ret;
+    printf("%s thread %lu start to work\n", pair->type, pair->id);
+    while((read_ret=read(*pair->read_fd, buffer, sizeof(buffer)-1)) > 0) {
+        write_ret = http_send_data(*pair->write_fd, buffer, read_ret);
+        if(write_ret<0) break;
+    }
+    
+    if(read_ret<=0) printf("%s thread %lu read failed, status %d\n", pair->type, pair->id, read_ret);
+    if(write_ret<=0) printf("%s thread %lu write failed, status %d\n", pair->type, pair->id, write_ret);
+
+    *pair->finished = 1;
+    pthread_cond_signal(pair->cond);
+
+    printf("%s thread %lu exited\n", pair->type, pair->id);
+    return NULL;
+}
+
+
+static unsigned long id;
+pthread_mutex_t id_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 
 /*
  * Opens a connection to the proxy target (hostname=server_proxy_hostname and
@@ -172,6 +340,47 @@ void handle_proxy_request(int fd) {
   }
 
   /* TODO: PART 4 */
+  unsigned long local_id;
+  pthread_mutex_lock(&id_mutex);
+  local_id = id++;
+  pthread_mutex_unlock(&id_mutex);
+
+  printf("Thread %lu will handle proxy request %lu.\n", pthread_self(), local_id);
+
+  struct fd_pair pairs[2];
+  pthread_mutex_t mutex;
+  pthread_cond_t cond;
+  int finished = 0;
+  pthread_mutex_init(&mutex, NULL);
+  pthread_cond_init(&cond, NULL);
+
+  pairs[0].read_fd = &fd;
+  pairs[0].write_fd = &target_fd;
+  pairs[0].finished = &finished;
+  pairs[0].type = "request";
+  pairs[0].cond = &cond;
+  pairs[0].id = local_id;
+
+  pairs[1].read_fd = &target_fd;
+  pairs[1].write_fd = &fd;
+  pairs[1].finished = &finished;
+  pairs[1].type = "response";
+  pairs[1].cond = &cond;
+  pairs[1].id = local_id;
+
+  pthread_t threads[2];
+  pthread_create(threads, NULL, relay_message, pairs);
+  pthread_create(threads+1, NULL, relay_message, pairs+1);
+
+  if(!finished) pthread_cond_wait(&cond, &mutex);
+
+  close(fd);
+  close(target_fd);
+
+  pthread_mutex_destroy(&mutex);
+  pthread_cond_destroy(&cond);
+
+  printf("Socket closed, proxy request %lu finished.\n\n", local_id);
 
 }
 
@@ -243,6 +452,17 @@ void serve_forever(int *socket_number, void (*request_handler)(int)) {
    */
 
 
+  if (bind(*socket_number, (struct sockaddr *) &server_address,
+            sizeof(server_address)) == -1) {
+    perror("Failed to bind on socket");
+    exit(errno);
+  }
+
+  if (listen(*socket_number, 1024) == -1) {
+      perror("Failed to listen on socket");
+      exit(errno);
+  }
+
   /* PART 1 END */
   printf("Listening on port %d...\n", server_port);
 
@@ -288,6 +508,11 @@ void serve_forever(int *socket_number, void (*request_handler)(int)) {
      * process should continue listening and accepting
      * connections.
      */
+      
+
+
+
+
 
     /* PART 5 END */
 #elif THREADSERVER
