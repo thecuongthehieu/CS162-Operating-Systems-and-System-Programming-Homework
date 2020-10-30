@@ -1,0 +1,15 @@
+1. Is the program’s output the same each time it is run? Why or why not?
+	- No. Because of Schedule
+
+2. Based on the program’s output, do multiple threads share the same stack?
+	- No
+
+3. Based on the program’s output, do multiple threads have separate copies of global variables?
+	- No
+
+4. Based on the program’s output, what is the value of void *threadid? How does this relate to the variable’s type (void *)?
+	- casting
+	
+5. Using the first command line argument, create a large number of threads in pthread. Do all threads run before the program exits? Why or why not?
+	- YES. Exiting the initial thread (for example, by calling the pthread_exit subroutine from the main routine) does not terminate the process. It terminates only the initial thread. If the initial thread is terminated, the process will be terminated when the last thread in it terminates. In this case, the process return code is 0.
+	- https://www.ibm.com/support/knowledgecenter/en/ssw_aix_71/generalprogramming/term_threads.html

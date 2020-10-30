@@ -1,0 +1,128 @@
+@node Development Tools
+@appendix Development Tools
+
+Here are some tools that you might find useful while developing code.
+
+@menu
+* Tags::
+* cscope::
+@ifset recommendcvs
+* CVS::
+@end ifset
+@ifset recommendgit
+* Git::
+@end ifset
+@ifset recommendvnc
+* VNC::
+@end ifset 
+@ifset recommendcygwin
+* Cygwin::
+@end ifset
+@end menu
+
+@node Tags
+@section Tags
+
+Tags are an index to the functions and global variables declared in a
+program.  Many editors, including Emacs and @command{vi}, can use
+them.  The @file{Makefile} in @file{pintos/src} produces Emacs-style
+tags with the command @code{make TAGS} or @command{vi}-style tags with
+@code{make tags}.
+
+In Emacs, use @kbd{M-.} to follow a tag in the current window,
+@kbd{C-x 4 .} in a new window, or @kbd{C-x 5 .} in a new frame.  If
+your cursor is on a symbol name for any of those commands, it becomes
+the default target.  If a tag name has multiple definitions, @kbd{M-0
+M-.} jumps to the next one.  To jump back to where you were before
+you followed the last tag, use @kbd{M-*}.
+
+@node cscope
+@section cscope
+
+The @command{cscope} program also provides an index to functions and
+variables declared in a program.  It has some features that tag
+facilities lack.  Most notably, it can find all the points in a
+program at which a given function is called.
+
+The @file{Makefile} in @file{pintos/src} produces @command{cscope}
+indexes when it is invoked as @code{make cscope}.  Once the index has
+been generated, run @command{cscope} from a shell command line; no
+command-line arguments are normally necessary.  Then use the arrow
+keys to choose one of the search criteria listed near the bottom of
+the terminal, type in an identifier, and hit @key{Enter}.
+@command{cscope} will then display the matches in the upper part of
+the terminal.  You may use the arrow keys to choose a particular
+match; if you then hit @key{Enter}, @command{cscope} will invoke the
+default system editor@footnote{This is typically @command{vi}.  To
+exit @command{vi}, type @kbd{: q @key{Enter}}.} and position the
+cursor on that match.  To start a new search, type @key{Tab}.  To exit
+@command{cscope}, type @kbd{Ctrl-d}.
+
+Emacs and some versions of @command{vi} have their own interfaces to
+@command{cscope}.  For information on how to use these interface,
+visit @url{http://cscope.sourceforge.net, the @command{cscope} home
+page}.
+
+@ifset recommendgit
+@node Git
+@section Git
+
+It's crucial that you use a source code control system to manage your
+Pintos code. This will allow you to keep track of your changes
+and coordinate changes made by different people in the project. For this
+class we recommend that you use Git; if you followed the instructions on
+getting started, a Git repository will already have been created for you.
+If you don't already know how to use Git, we recommend that you read
+the @uref{http://git-scm.com/book, , Pro Git} book online.
+@end ifset
+
+@ifset recommendcvs
+@node CVS
+@section CVS
+
+CVS is a version-control system.  That is, you can use it to keep
+track of multiple versions of files.  The idea is that you do some
+work on your code and test it, then check it into the version-control
+system.  If you decide that the work you've done since your last
+check-in is no good, you can easily revert to the last checked-in
+version.  Furthermore, you can retrieve any old version of your code
+as of some given day and time.  The version control logs tell you who
+made changes and when.
+
+CVS is not the best version control system out there, but it's
+free, it's fairly easy to use, and it's already installed in most
+Unix-like environments.
+
+For more information, visit the @uref{https://www.cvshome.org/, , CVS
+home page}.
+
+@include localcvsinstructions.texi
+@end ifset
+
+@ifset recommendvnc
+@node VNC
+@section VNC
+
+VNC stands for Virtual Network Computing.  It is, in essence, a remote
+display system which allows you to view a computing ``desktop''
+environment not only on the machine where it is running, but from
+anywhere on the Internet and from a wide variety of machine
+architectures.  It is already installed on the lab machines.  
+For more information, look at the @uref{http://www.realvnc.com/, , VNC
+Home Page}.
+@end ifset
+
+@ifset recommendcygwin
+@node Cygwin
+@section Cygwin
+
+@uref{http://cygwin.com/, ,Cygwin} provides a Linux-compatible environment
+for Windows.  It includes ssh client and an X11 server, Cygwin/X.  If your
+primary work environment is Windows, you will find Cygwin/X extremely
+useful for these projects.  Install Cygwin/X, then start the X server
+and open a new xterm.  The X11 server also allows you to run pintos while
+displaying the bochs- or qemu-emulated console on your Windows desktop.
+@end ifset
+
+@localdevelopmenttools{}
+

@@ -1,0 +1,392 @@
+@node 4.4BSD Scheduler
+@appendix 4.4@acronym{BSD} Scheduler
+
+@iftex
+@macro tm{TEX}
+@math{\TEX\}
+@end macro
+@macro nm{TXT}
+@end macro
+@macro am{TEX, TXT}
+@math{\TEX\}
+@end macro
+@end iftex
+
+@ifnottex
+@macro tm{TEX}
+@end macro
+@macro nm{TXT}
+@w{\TXT\}
+@end macro
+@macro am{TEX, TXT}
+@w{\TXT\}
+@end macro
+@end ifnottex
+
+@ifhtml
+@macro math{TXT}
+\TXT\
+@end macro
+@end ifhtml
+
+@macro m{MATH}
+@am{\MATH\, \MATH\}
+@end macro
+
+The goal of a general-purpose scheduler is to balance threads' different
+scheduling needs.  Threads that perform a lot of I/O require a fast
+response time to keep input and output devices busy, but need little CPU
+time.  On the other hand, compute-bound threads need to receive a lot of
+CPU time to finish their work, but have no requirement for fast response
+time.  Other threads lie somewhere in between, with periods of I/O
+punctuated by periods of computation, and thus have requirements that
+vary over time.  A well-designed scheduler can often accommodate threads
+with all these requirements simultaneously.
+
+For project 1, you must implement the scheduler described in this
+appendix.  Our scheduler resembles the one described in @bibref{McKusick},
+which is one example of a @dfn{multilevel feedback queue} scheduler.
+This type of scheduler maintains several queues of ready-to-run threads,
+where each queue holds threads with a different priority.  At any given
+time, the scheduler chooses a thread from the highest-priority non-empty
+queue.  If the highest-priority queue contains multiple threads, then
+they run in ``round robin'' order.
+
+Multiple facets of the scheduler require data to be updated after a
+certain number of timer ticks.  In every case, these updates should
+occur before any ordinary kernel thread has a chance to run, so that
+there is no chance that a kernel thread could see a newly increased
+@func{timer_ticks} value but old scheduler data values.
+
+The 4.4@acronym{BSD} scheduler does not include priority donation.
+
+@menu
+* Thread Niceness::             
+* Calculating Priority::        
+* Calculating recent_cpu::      
+* Calculating load_avg::        
+* 4.4BSD Scheduler Summary::    
+* Fixed-Point Real Arithmetic::  
+@end menu
+
+@node Thread Niceness
+@section Niceness
+
+Thread priority is dynamically determined by the scheduler using a
+formula given below.  However, each thread also has an integer
+@dfn{nice} value that determines how ``nice'' the thread should be to
+other threads.  A @var{nice} of zero does not affect thread priority.  A
+positive @var{nice}, to the maximum of 20, decreases the priority of a 
+thread and causes it to give up some CPU time it would otherwise receive.
+On the other hand, a negative @var{nice}, to the minimum of -20, tends
+to take away CPU time from other threads.
+
+The initial thread starts with a @var{nice} value of zero.  Other
+threads start with a @var{nice} value inherited from their parent
+thread.  You must implement the functions described below, which are for
+use by test programs.  We have provided skeleton definitions for them in
+@file{threads/thread.c}.
+
+@deftypefun int thread_get_nice (void)
+Returns the current thread's @var{nice} value.
+@end deftypefun
+
+@deftypefun void thread_set_nice (int @var{new_nice})
+Sets the current thread's @var{nice} value to @var{new_nice} and
+recalculates the thread's priority based on the new value
+(@pxref{Calculating Priority}).  If the running thread no longer has the
+highest priority, yields.
+@end deftypefun
+
+@node Calculating Priority
+@section Calculating Priority
+
+Our scheduler has 64 priorities and thus 64 ready queues, numbered 0
+(@code{PRI_MIN}) through 63 (@code{PRI_MAX}).  Lower numbers correspond
+to lower priorities, so that priority 0 is the lowest priority
+and priority 63 is the highest.  Thread priority is calculated initially
+at thread initialization.  It is also recalculated once every fourth
+clock tick, for every thread.  In either case, it is determined by
+the formula
+
+@center @t{@var{priority} = @code{PRI_MAX} - (@var{recent_cpu} / 4) - (@var{nice} * 2)},
+
+@noindent where @var{recent_cpu} is an estimate of the CPU time the
+thread has used recently (see below) and @var{nice} is the thread's
+@var{nice} value.  The result should be rounded down to the nearest
+integer (truncated).
+The coefficients @math{1/4} and 2 on @var{recent_cpu}
+and @var{nice}, respectively, have been found to work well in practice
+but lack deeper meaning.  The calculated @var{priority} is always
+adjusted to lie in the valid range @code{PRI_MIN} to @code{PRI_MAX}.
+
+This formula gives a thread that has received CPU
+time recently lower priority for being reassigned the CPU the next
+time the scheduler runs.  This is key to preventing starvation: a
+thread that has not received any CPU time recently will have a
+@var{recent_cpu} of 0, which barring a high @var{nice} value should
+ensure that it receives CPU time soon.
+
+@node Calculating recent_cpu
+@section Calculating @var{recent_cpu}
+
+We wish @var{recent_cpu} to measure how much CPU time each process has
+received ``recently.'' Furthermore, as a refinement, more recent CPU
+time should be weighted more heavily than less recent CPU time.  One
+approach would use an array of @var{n} elements to
+track the CPU time received in each of the last @var{n} seconds.
+However, this approach requires O(@var{n}) space per thread and
+O(@var{n}) time per calculation of a new weighted average.
+
+Instead, we use a @dfn{exponentially weighted moving average}, which
+takes this general form:
+
+@center @tm{x(0) = f(0),}@nm{x(0) = f(0),}
+@center @tm{x(t) = ax(t-1) + (1-a)f(t),}@nm{x(t) = a*x(t-1) + f(t),}
+@center @tm{a = k/(k+1),}@nm{a = k/(k+1),}
+
+@noindent where @math{x(t)} is the moving average at integer time @am{t
+\ge 0, t >= 0}, @math{f(t)} is the function being averaged, and @math{k
+> 0} controls the rate of decay.  We can iterate the formula over a few
+steps as follows:
+
+@center @math{x(1) = f(1)},
+@center @am{x(2) = af(1) + f(2), x(2) = a*f(1) + f(2)},
+@center @am{\vdots, ...}
+@center @am{x(5) = a^4f(1) + a^3f(2) + a^2f(3) + af(4) + f(5), x(5) = a**4*f(1) + a**3*f(2) + a**2*f(3) + a*f(4) + f(5)}.
+
+@noindent The value of @math{f(t)} has a weight of 1 at time @math{t}, a
+weight of @math{a} at time @math{t+1}, @am{a^2, a**2} at time
+@math{t+2}, and so on.  We can also relate @math{x(t)} to @math{k}:
+@math{f(t)} has a weight of approximately @math{1/e} at time @math{t+k},
+approximately @am{1/e^2, 1/e**2} at time @am{t+2k, t+2*k}, and so on.
+From the opposite direction, @math{f(t)} decays to weight @math{w} at
+time @am{t + \log_aw, t + ln(w)/ln(a)}.
+
+The initial value of @var{recent_cpu} is 0 in the first thread
+created, or the parent's value in other new threads.  Each time a timer
+interrupt occurs, @var{recent_cpu} is incremented by 1 for the running
+thread only, unless the idle thread is running.  In addition, once per
+second the value of @var{recent_cpu}
+is recalculated for every thread (whether running, ready, or blocked),
+using this formula:
+
+@center @t{@var{recent_cpu} = (2*@var{load_avg})/(2*@var{load_avg} + 1) * @var{recent_cpu} + @var{nice}},
+
+@noindent where @var{load_avg} is a moving average of the number of
+threads ready to run (see below).  If @var{load_avg} is 1, indicating
+that a single thread, on average, is competing for the CPU, then the
+current value of @var{recent_cpu} decays to a weight of .1 in
+@am{\log_{2/3}.1 \approx 6, ln(.1)/ln(2/3) = approx. 6} seconds; if
+@var{load_avg} is 2, then decay to a weight of .1 takes @am{\log_{3/4}.1
+\approx 8, ln(.1)/ln(3/4) = approx. 8} seconds.  The effect is that
+@var{recent_cpu} estimates the amount of CPU time the thread has
+received ``recently,'' with the rate of decay inversely proportional to
+the number of threads competing for the CPU.
+
+Assumptions made by some of the tests require that these recalculations of
+@var{recent_cpu} be made exactly when the system tick counter reaches a
+multiple of a second, that is, when @code{timer_ticks () % TIMER_FREQ ==
+0}, and not at any other time.
+
+The value of @var{recent_cpu} can be negative for a thread with a
+negative @var{nice} value.  Do not clamp negative @var{recent_cpu} to 0.
+
+You may need to think about the order of calculations in this formula.
+We recommend computing the coefficient of @var{recent_cpu} first, then
+multiplying.  Some students have reported that multiplying
+@var{load_avg} by @var{recent_cpu} directly can cause overflow.
+
+You must implement @func{thread_get_recent_cpu}, for which there is a
+skeleton in @file{threads/thread.c}.
+
+@deftypefun int thread_get_recent_cpu (void)
+Returns 100 times the current thread's @var{recent_cpu} value, rounded
+to the nearest integer.
+@end deftypefun
+
+@node Calculating load_avg
+@section Calculating @var{load_avg}
+
+Finally, @var{load_avg}, often known as the system load average,
+estimates the average number of threads ready to run over the past
+minute.  Like @var{recent_cpu}, it is an exponentially weighted moving
+average.  Unlike @var{priority} and @var{recent_cpu}, @var{load_avg} is
+system-wide, not thread-specific.  At system boot, it is initialized to
+0.  Once per second thereafter, it is updated according to the following
+formula:
+
+@center @t{@var{load_avg} = (59/60)*@var{load_avg} + (1/60)*@var{ready_threads}},
+
+@noindent where @var{ready_threads} is the number of threads that are
+either running or ready to run at time of update (not including the idle
+thread).
+
+Because of assumptions made by some of the tests, @var{load_avg} must be
+updated exactly when the system tick counter reaches a multiple of a
+second, that is, when @code{timer_ticks () % TIMER_FREQ == 0}, and not
+at any other time.
+
+You must implement @func{thread_get_load_avg}, for which there is a
+skeleton in @file{threads/thread.c}.
+
+@deftypefun int thread_get_load_avg (void)
+Returns 100 times the current system load average, rounded to the
+nearest integer.
+@end deftypefun
+
+@node 4.4BSD Scheduler Summary
+@section Summary
+
+The following formulas summarize the calculations required to implement the
+scheduler.  They are not a complete description of scheduler requirements.
+
+Every thread has a @var{nice} value between -20 and 20 directly under
+its control.  Each thread also has a priority, between 0
+(@code{PRI_MIN}) through 63 (@code{PRI_MAX}), which is recalculated
+using the following formula every fourth tick:
+
+@center @t{@var{priority} = @code{PRI_MAX} - (@var{recent_cpu} / 4) - (@var{nice} * 2)}.
+
+@var{recent_cpu} measures the amount of CPU time a thread has received
+``recently.''  On each timer tick, the running thread's @var{recent_cpu}
+is incremented by 1.  Once per second, every thread's @var{recent_cpu}
+is updated this way:
+
+@center @t{@var{recent_cpu} = (2*@var{load_avg})/(2*@var{load_avg} + 1) * @var{recent_cpu} + @var{nice}}.
+
+@var{load_avg} estimates the average number of threads ready to run over
+the past minute.  It is initialized to 0 at boot and recalculated once
+per second as follows:
+
+@center @t{@var{load_avg} = (59/60)*@var{load_avg} + (1/60)*@var{ready_threads}}.
+
+@noindent where @var{ready_threads} is the number of threads that are
+either running or ready to run at time of update (not including the idle
+thread).
+
+@node Fixed-Point Real Arithmetic
+@section Fixed-Point Real Arithmetic
+
+In the formulas above, @var{priority}, @var{nice}, and
+@var{ready_threads} are integers, but @var{recent_cpu} and @var{load_avg}
+are real numbers.  Unfortunately, Pintos does not support floating-point
+arithmetic in the kernel, because it would
+complicate and slow the kernel.  Real kernels often have the same
+limitation, for the same reason.  This means that calculations on real
+quantities must be simulated using integers.  This is not
+difficult, but many students do not know how to do it.  This
+section explains the basics.
+
+The fundamental idea is to treat the rightmost bits of an integer as
+representing a fraction.  For example, we can designate the lowest 14
+bits of a signed 32-bit integer as fractional bits, so that an integer
+@m{x} represents the real number
+@iftex
+@m{x/2^{14}}.
+@end iftex
+@ifnottex
+@m{x/(2**14)}, where ** represents exponentiation.
+@end ifnottex
+This is called a 17.14 fixed-point number representation, because there
+are 17 bits before the decimal point, 14 bits after it, and one sign
+bit.@footnote{Because we are working in binary, the ``decimal'' point
+might more correctly be called the ``binary'' point, but the meaning
+should be clear.} A number in 17.14 format represents, at maximum, a
+value of @am{(2^{31} - 1) / 2^{14} \approx, (2**31 - 1)/(2**14) =
+approx.} 131,071.999.
+
+Suppose that we are using a @m{p.q} fixed-point format, and let @am{f =
+2^q, f = 2**q}.  By the definition above, we can convert an integer or
+real number into @m{p.q} format by multiplying with @m{f}.  For example,
+in 17.14 format the fraction 59/60 used in the calculation of
+@var{load_avg}, above, is @am{(59/60)2^{14}, 59/60*(2**14)} = 16,110.
+To convert a fixed-point value back to an
+integer, divide by @m{f}.  (The normal @samp{/} operator in C rounds
+toward zero, that is, it rounds positive numbers down and negative
+numbers up.  To round to nearest, add @m{f / 2} to a positive number, or
+subtract it from a negative number, before dividing.)
+
+Many operations on fixed-point numbers are straightforward.  Let
+@code{x} and @code{y} be fixed-point numbers, and let @code{n} be an
+integer.  Then the sum of @code{x} and @code{y} is @code{x + y} and
+their difference is @code{x - y}.  The sum of @code{x} and @code{n} is
+@code{x + n * f}; difference, @code{x - n * f}; product, @code{x * n};
+quotient, @code{x / n}.
+
+Multiplying two fixed-point values has two complications.  First, the
+decimal point of the result is @m{q} bits too far to the left.  Consider
+that @am{(59/60)(59/60), (59/60)*(59/60)} should be slightly less than
+1, but @tm{16,111\times 16,111}@nm{16,111*16,111} = 259,564,321 is much
+greater than @am{2^{14},2**14} = 16,384.  Shifting @m{q} bits right, we
+get @tm{259,564,321/2^{14}}@nm{259,564,321/(2**14)} = 15,842, or about 0.97,
+the correct answer.  Second, the multiplication can overflow even though
+the answer is representable.  For example, 64 in 17.14 format is
+@am{64 \times 2^{14}, 64*(2**14)} = 1,048,576 and its square @am{64^2,
+64**2} = 4,096 is well within the 17.14 range, but @tm{1,048,576^2 =
+2^{40}}@nm{1,048,576**2 = 2**40}, greater than the maximum signed 32-bit
+integer value @am{2^{31} - 1, 2**31 - 1}.  An easy solution is to do the
+multiplication as a 64-bit operation.  The product of @code{x} and
+@code{y} is then @code{((int64_t) x) * y / f}.
+
+Dividing two fixed-point values has opposite issues.  The
+decimal point will be too far to the right, which we fix by shifting the
+dividend @m{q} bits to the left before the division.  The left shift
+discards the top @m{q} bits of the dividend, which we can again fix by
+doing the division in 64 bits.  Thus, the quotient when @code{x} is
+divided by @code{y} is @code{((int64_t) x) * f / y}.
+
+This section has consistently used multiplication or division by @m{f},
+instead of @m{q}-bit shifts, for two reasons.  First, multiplication and
+division do not have the surprising operator precedence of the C shift
+operators.  Second, multiplication and division are well-defined on
+negative operands, but the C shift operators are not.  Take care with
+these issues in your implementation.
+
+The following table summarizes how fixed-point arithmetic operations can
+be implemented in C.  In the table, @code{x} and @code{y} are
+fixed-point numbers, @code{n} is an integer, fixed-point numbers are in
+signed @m{p.q} format where @m{p + q = 31}, and @code{f} is @code{1 <<
+q}:
+
+@html
+<CENTER>
+@end html
+@multitable @columnfractions .5 .5
+@item Convert @code{n} to fixed point:
+@tab @code{n * f}
+
+@item Convert @code{x} to integer (rounding toward zero):
+@tab @code{x / f}
+
+@item Convert @code{x} to integer (rounding to nearest):
+@tab @code{(x + f / 2) / f} if @code{x >= 0}, @*
+@code{(x - f / 2) / f} if @code{x <= 0}.
+
+@item Add @code{x} and @code{y}:
+@tab @code{x + y}
+
+@item Subtract @code{y} from @code{x}:
+@tab @code{x - y}
+
+@item Add @code{x} and @code{n}:
+@tab @code{x + n * f}
+
+@item Subtract @code{n} from @code{x}:
+@tab @code{x - n * f}
+
+@item Multiply @code{x} by @code{y}:
+@tab @code{((int64_t) x) * y / f}
+
+@item Multiply @code{x} by @code{n}:
+@tab @code{x * n}
+
+@item Divide @code{x} by @code{y}:
+@tab @code{((int64_t) x) * f / y}
+
+@item Divide @code{x} by @code{n}:
+@tab @code{x / n}
+@end multitable
+@html
+</CENTER>
+@end html

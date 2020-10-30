@@ -1,0 +1,88 @@
+\input texinfo                          @c -*- texinfo -*-
+
+@c %**start of header
+@setfilename pintos.info
+@settitle Pintos Projects
+@c %**end of header
+
+@c @bibref{} macro
+@iftex
+@macro bibref{cite}
+[\cite\]
+@end macro
+@end iftex
+@ifinfo
+@ifnotplaintext
+@macro bibref{cite}
+@ref{\cite\}
+@end macro
+@end ifnotplaintext
+@ifplaintext
+@macro bibref{cite}
+[\cite\]
+@end macro
+@end ifplaintext
+@end ifinfo
+@ifhtml
+@macro bibref{cite}
+[@ref{\cite\}]
+@end macro
+@end ifhtml
+
+@macro func{name}
+@code{\name\()}
+@end macro
+
+@macro struct{name}
+@code{struct \name\}
+@end macro
+
+@titlepage
+@title Pintos
+@author by Ben Pfaff
+@end titlepage
+
+@shortcontents
+@contents
+
+@ifnottex
+@node Top, Introduction, (dir), (dir)
+@top Pintos Projects
+@end ifnottex
+
+@menu
+* Introduction::                
+* Project 1--Threads::          
+* Project 2--User Programs::    
+* Project 3--Virtual Memory::   
+* Project 4--File Systems::     
+* Reference Guide::
+* 4.4BSD Scheduler::  
+* Coding Standards::            
+* Project Documentation::       
+* Debugging Tools::             
+* Development Tools::
+* Installing Pintos::
+* Bibliography::
+* License::
+@end menu
+
+@c institution-local settings
+@include localsettings.texi
+
+@include intro.texi
+@include threads.texi
+@include userprog.texi
+@include vm.texi
+@include filesys.texi
+@include reference.texi
+@include 44bsd.texi
+@include standards.texi
+@include doc.texi
+@include debug.texi
+@include devel.texi
+@include installation.texi
+@include bibliography.texi
+@include license.texi
+
+@bye

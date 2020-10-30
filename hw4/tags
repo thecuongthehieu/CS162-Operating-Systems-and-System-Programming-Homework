@@ -1,0 +1,155 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+CC	Makefile	/^CC=gcc$/;"	m
+CDL_COUNT	utlist.h	748;"	d
+CDL_COUNT2	utlist.h	750;"	d
+CDL_DELETE	utlist.h	734;"	d
+CDL_DELETE2	utlist.h	736;"	d
+CDL_FOREACH	utlist.h	756;"	d
+CDL_FOREACH2	utlist.h	758;"	d
+CDL_FOREACH_SAFE	utlist.h	761;"	d
+CDL_FOREACH_SAFE2	utlist.h	763;"	d
+CDL_PREPEND	utlist.h	718;"	d
+CDL_PREPEND2	utlist.h	720;"	d
+CDL_PREPEND_ELEM	utlist.h	807;"	d
+CDL_REPLACE_ELEM	utlist.h	787;"	d
+CDL_SEARCH	utlist.h	777;"	d
+CDL_SEARCH2	utlist.h	779;"	d
+CDL_SEARCH_SCALAR	utlist.h	767;"	d
+CDL_SEARCH_SCALAR2	utlist.h	769;"	d
+CDL_SORT	utlist.h	288;"	d
+CDL_SORT2	utlist.h	290;"	d
+CFLAGS	Makefile	/^CFLAGS=-g -ggdb3 -Wall -std=gnu99$/;"	m
+DL_APPEND	utlist.h	597;"	d
+DL_APPEND2	utlist.h	599;"	d
+DL_CONCAT	utlist.h	499;"	d
+DL_CONCAT	utlist.h	613;"	d
+DL_CONCAT2	utlist.h	615;"	d
+DL_COUNT	utlist.h	650;"	d
+DL_COUNT2	utlist.h	652;"	d
+DL_DELETE	utlist.h	630;"	d
+DL_DELETE2	utlist.h	632;"	d
+DL_FOREACH	utlist.h	658;"	d
+DL_FOREACH2	utlist.h	660;"	d
+DL_FOREACH_SAFE	utlist.h	663;"	d
+DL_FOREACH_SAFE2	utlist.h	665;"	d
+DL_PREPEND	utlist.h	583;"	d
+DL_PREPEND2	utlist.h	585;"	d
+DL_PREPEND_ELEM	utlist.h	700;"	d
+DL_REPLACE_ELEM	utlist.h	674;"	d
+DL_SEARCH	utlist.h	670;"	d
+DL_SEARCH2	utlist.h	672;"	d
+DL_SEARCH_SCALAR	utlist.h	669;"	d
+DL_SEARCH_SCALAR2	utlist.h	671;"	d
+DL_SORT	utlist.h	206;"	d
+DL_SORT2	utlist.h	208;"	d
+EXECUTABLES	Makefile	/^EXECUTABLES=httpserver forkserver poolserver$/;"	m
+LDECLTYPE	utlist.h	68;"	d
+LDECLTYPE	utlist.h	71;"	d
+LDECLTYPE	utlist.h	75;"	d
+LDECLTYPE	utlist.h	77;"	d
+LDFLAGS	Makefile	/^LDFLAGS=-pthread$/;"	m
+LIBHTTP_H	libhttp.h	21;"	d
+LIBHTTP_REQUEST_MAX_SIZE	libhttp.c	9;"	d	file:
+LL_APPEND	utlist.h	417;"	d
+LL_APPEND	utlist.h	490;"	d
+LL_APPEND	utlist.h	491;"	d
+LL_APPEND2	utlist.h	419;"	d
+LL_APPEND2	utlist.h	496;"	d
+LL_APPEND2	utlist.h	497;"	d
+LL_APPEND2_VS2008	utlist.h	455;"	d
+LL_APPEND_VS2008	utlist.h	453;"	d
+LL_CONCAT	utlist.h	401;"	d
+LL_CONCAT	utlist.h	498;"	d
+LL_CONCAT2	utlist.h	403;"	d
+LL_COUNT	utlist.h	503;"	d
+LL_COUNT2	utlist.h	505;"	d
+LL_DELETE	utlist.h	434;"	d
+LL_DELETE	utlist.h	492;"	d
+LL_DELETE	utlist.h	493;"	d
+LL_DELETE2	utlist.h	436;"	d
+LL_DELETE2	utlist.h	494;"	d
+LL_DELETE2	utlist.h	495;"	d
+LL_DELETE2_VS2008	utlist.h	471;"	d
+LL_DELETE_VS2008	utlist.h	469;"	d
+LL_FOREACH	utlist.h	511;"	d
+LL_FOREACH2	utlist.h	513;"	d
+LL_FOREACH_SAFE	utlist.h	515;"	d
+LL_FOREACH_SAFE2	utlist.h	517;"	d
+LL_PREPEND	utlist.h	393;"	d
+LL_PREPEND2	utlist.h	395;"	d
+LL_PREPEND_ELEM	utlist.h	560;"	d
+LL_REPLACE_ELEM	utlist.h	540;"	d
+LL_SEARCH	utlist.h	530;"	d
+LL_SEARCH2	utlist.h	532;"	d
+LL_SEARCH_SCALAR	utlist.h	520;"	d
+LL_SEARCH_SCALAR2	utlist.h	522;"	d
+LL_SORT	utlist.h	126;"	d
+LL_SORT2	utlist.h	128;"	d
+NO_DECLTYPE	utlist.h	70;"	d
+NO_DECLTYPE	utlist.h	74;"	d
+SOURCE	Makefile	/^SOURCE=httpserver.c libhttp.c wq.c$/;"	m
+USAGE	httpserver.c	/^char *USAGE =$/;"	v
+UTLIST_H	utlist.h	25;"	d
+UTLIST_VERSION	utlist.h	27;"	d
+_CASTASGN	utlist.h	107;"	d
+_CASTASGN	utlist.h	119;"	d
+_NEXT	utlist.h	114;"	d
+_NEXT	utlist.h	90;"	d
+_NEXTASGN	utlist.h	115;"	d
+_NEXTASGN	utlist.h	91;"	d
+_PREVASGN	utlist.h	117;"	d
+_PREVASGN	utlist.h	97;"	d
+_RS	utlist.h	102;"	d
+_RS	utlist.h	118;"	d
+_SV	utlist.h	113;"	d
+_SV	utlist.h	84;"	d
+__WQ__	wq.h	2;"	d
+client_socket_fd	wq.h	/^  int client_socket_fd; \/\/ Client socket to be served.$/;"	m	struct:wq_item
+condvar	wq.h	/^  pthread_cond_t condvar;$/;"	m	struct:wq
+exit_with_usage	httpserver.c	/^void exit_with_usage() {$/;"	f
+handle_clients	httpserver.c	/^void *handle_clients(void *void_request_handler) {$/;"	f
+handle_files_request	httpserver.c	/^void handle_files_request(int fd) {$/;"	f
+handle_proxy_request	httpserver.c	/^void handle_proxy_request(int fd) {$/;"	f
+head	wq.h	/^  wq_item_t *head;$/;"	m	struct:wq
+http_end_headers	libhttp.c	/^void http_end_headers(int fd) {$/;"	f
+http_fatal_error	libhttp.c	/^void http_fatal_error(char *message) {$/;"	f
+http_get_mime_type	libhttp.c	/^char *http_get_mime_type(char *file_name) {$/;"	f
+http_get_response_message	libhttp.c	/^char* http_get_response_message(int status_code) {$/;"	f
+http_request	libhttp.h	/^struct http_request {$/;"	s
+http_request_parse	libhttp.c	/^struct http_request *http_request_parse(int fd) {$/;"	f
+http_send_data	libhttp.c	/^void http_send_data(int fd, char *data, size_t size) {$/;"	f
+http_send_header	libhttp.c	/^void http_send_header(int fd, char *key, char *value) {$/;"	f
+http_send_string	libhttp.c	/^void http_send_string(int fd, char *data) {$/;"	f
+http_start_response	libhttp.c	/^void http_start_response(int fd, int status_code) {$/;"	f
+init_thread_pool	httpserver.c	/^void init_thread_pool(int num_threads, void (*request_handler)(int)) {$/;"	f
+main	httpserver.c	/^int main(int argc, char **argv) {$/;"	f
+method	libhttp.h	/^  char *method;$/;"	m	struct:http_request
+mutex	wq.h	/^  pthread_mutex_t mutex;$/;"	m	struct:wq
+next	wq.h	/^  struct wq_item *next;$/;"	m	struct:wq_item	typeref:struct:wq_item::wq_item
+num_threads	httpserver.c	/^int num_threads;$/;"	v
+path	libhttp.h	/^  char *path;$/;"	m	struct:http_request
+prev	wq.h	/^  struct wq_item *prev;$/;"	m	struct:wq_item	typeref:struct:wq_item::wq_item
+serve_directory	httpserver.c	/^void serve_directory(int fd, char *path) {$/;"	f
+serve_file	httpserver.c	/^void serve_file(int fd, char *path) {$/;"	f
+serve_forever	httpserver.c	/^void serve_forever(int *socket_number, void (*request_handler)(int)) {$/;"	f
+server_fd	httpserver.c	/^int server_fd;$/;"	v
+server_files_directory	httpserver.c	/^char *server_files_directory;$/;"	v
+server_port	httpserver.c	/^int server_port;$/;"	v
+server_proxy_hostname	httpserver.c	/^char *server_proxy_hostname;$/;"	v
+server_proxy_port	httpserver.c	/^int server_proxy_port;$/;"	v
+signal_callback_handler	httpserver.c	/^void signal_callback_handler(int signum) {$/;"	f
+size	wq.h	/^  int size;$/;"	m	struct:wq
+transfer_data	httpserver.c	/^void *transfer_data(void *fds_) {$/;"	f
+work_queue	httpserver.c	/^wq_t work_queue;$/;"	v
+wq	wq.h	/^typedef struct wq {$/;"	s
+wq_init	wq.c	/^void wq_init(wq_t *wq) {$/;"	f
+wq_item	wq.h	/^typedef struct wq_item {$/;"	s
+wq_item_t	wq.h	/^} wq_item_t;$/;"	t	typeref:struct:wq_item
+wq_pop	wq.c	/^int wq_pop(wq_t *wq) {$/;"	f
+wq_push	wq.c	/^void wq_push(wq_t *wq, int client_socket_fd) {$/;"	f
+wq_t	wq.h	/^} wq_t;$/;"	t	typeref:struct:wq
