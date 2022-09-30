@@ -20,5 +20,5 @@
   - git commit -m "Added a test file."
   - git push personal master
 
-## Homework documents
+## Homework Documents
   - https://github.com/thecuongthehieu/CS162-Operating-Systems-and-System-Programming/tree/master/Homework
